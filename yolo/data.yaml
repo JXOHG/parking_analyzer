@@ -1,0 +1,6 @@
+
+train: parking_dataset/images/train
+val: parking_dataset/images/validation
+
+nc: 1  # number of classes
+names: ['car']
