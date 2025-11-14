@@ -1,6 +1,6 @@
-weights: C:\Users\justi\Documents\CAF\RMC-CMR\1st Year\CSE407\final project\project\Project\yolov9\weights\yolov9-c.pt
+weights: c:\Users\justi\Documents\parking_analyzer\parking_analyzer\yolo\yolov9\weights\yolov9-c.pt
 cfg: models/detect/yolov9-c.yaml
-data: C:\Users\justi\Documents\CAF\RMC-CMR\1st Year\CSE407\final project\project\Project\prepared_data\yolo\data.yaml
+data: c:\Users\justi\Documents\parking_analyzer\parking_analyzer\yolo\prepared_data\yolo\data.yaml
 hyp:
   lr0: 0.01
   lrf: 0.01
@@ -50,7 +50,7 @@ single_cls: false
 optimizer: SGD
 sync_bn: false
 workers: 0
-project: C:\Users\justi\Documents\CAF\RMC-CMR\1st Year\CSE407\final project\project\Project\runs\train
+project: c:\Users\justi\Documents\parking_analyzer\parking_analyzer\yolo\runs\train
 name: carpk_yolov9
 exist_ok: true
 quad: false
@@ -70,4 +70,4 @@ entity: null
 upload_dataset: false
 bbox_interval: -1
 artifact_alias: latest
-save_dir: C:\Users\justi\Documents\CAF\RMC-CMR\1st Year\CSE407\final project\project\Project\runs\train\carpk_yolov9
+save_dir: c:\Users\justi\Documents\parking_analyzer\parking_analyzer\yolo\runs\train\carpk_yolov9

@@ -4,3 +4,5 @@ yolo/runs/train/carpk_yolov9/weights/*.pt filter=lfs diff=lfs merge=lfs -text
 yolo/prepared_data/** filter=lfs diff=lfs merge=lfs -text
 /rcnn/runs/rcnn/** filter=lfs diff=lfs merge=lfs -text
 rcnn/runs/rcnn/** filter=lfs diff=lfs merge=lfs -text
+*.jpg filter=lfs diff=lfs merge=lfs -text
+*.png filter=lfs diff=lfs merge=lfs -text

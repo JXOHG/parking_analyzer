@@ -1,5 +1,5 @@
 
-train: parking_dataset/images/train
+train: prepared_data/yolo/train/images
 val: parking_dataset/images/validation
 
 nc: 1  # number of classes
