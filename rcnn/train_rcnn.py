@@ -27,11 +27,12 @@ class COCODataset(torch.utils.data.Dataset):
     """
     FIXED: Properly handles transforms and validates all data
     """
-    def __init__(self, json_file, img_dir, transforms=None):
+    def __init__(self, json_file, img_dir, transforms=None, train=False):
         from pycocotools.coco import COCO
         
         self.img_dir = Path(img_dir)
         self.transforms = transforms
+        self.train = train
         
         # Load COCO annotations
         print(f"📂 Loading annotations from {json_file}...")
@@ -121,6 +122,21 @@ class COCODataset(torch.utils.data.Dataset):
             labels.append(ann['category_id'])
             areas.append(ann['area'])
         
+        # Apply data augmentation before converting to tensors
+        img_width, img_height = img.size
+        
+        # Random horizontal flip for training
+        if self.train and len(boxes) > 0 and np.random.rand() < 0.5:
+            # Flip image
+            img = img.transpose(Image.FLIP_LEFT_RIGHT)
+            
+            # Flip boxes: [x1, y1, x2, y2] -> [w-x2, y1, w-x1, y2]
+            flipped_boxes = []
+            for box in boxes:
+                x1, y1, x2, y2 = box
+                flipped_boxes.append([img_width - x2, y1, img_width - x1, y2])
+            boxes = flipped_boxes
+        
         # Convert to tensors
         if len(boxes) > 0:
             boxes = torch.as_tensor(boxes, dtype=torch.float32)
@@ -154,19 +170,20 @@ class COCODataset(torch.utils.data.Dataset):
 
 def get_transform(train=False):
     """
-    FIXED: Simple transforms that work with detection models
-    Only normalize the image - augmentations handled by model
+    Create transforms for Faster R-CNN.
+    IMPORTANT: Faster R-CNN expects unnormalized images in [0, 255] range!
+    
+    Note: This function only handles image transforms. Data augmentation that
+    affects bounding boxes (like RandomHorizontalFlip) should be implemented
+    in the dataset's __getitem__ method to properly transform both images and boxes.
     """
     transforms = []
     
-    # Convert PIL to Tensor
+    # Convert PIL to Tensor (scales to [0, 1])
     transforms.append(torchvision.transforms.ToTensor())
     
-    # Normalize using ImageNet stats
-    transforms.append(torchvision.transforms.Normalize(
-        mean=[0.485, 0.456, 0.406],
-        std=[0.229, 0.224, 0.225]
-    ))
+    # Scale back to [0, 255] - Faster R-CNN expects this!
+    transforms.append(torchvision.transforms.Lambda(lambda x: x * 255.0))
     
     return torchvision.transforms.Compose(transforms)
 
@@ -478,13 +495,15 @@ def main(args):
         train_dataset = COCODataset(
             json_file=data_path / 'train.json',
             img_dir=data_path / 'train',
-            transforms=get_transform(train=True)
+            transforms=get_transform(train=True),
+            train=True
         )
         
         val_dataset = COCODataset(
             json_file=data_path / 'val.json',
             img_dir=data_path / 'val',
-            transforms=get_transform(train=False)
+            transforms=get_transform(train=False),
+            train=False
         )
     except Exception as e:
         print(f"❌ Failed to load datasets: {e}")
@@ -743,7 +762,7 @@ if __name__ == '__main__':
     # Training
     parser.add_argument('--epochs', type=int, default=50,
                         help='Number of training epochs')
-    parser.add_argument('--batch-size', type=int, default=4,
+    parser.add_argument('--batch-size', type=int, default=2,
                         help='Batch size per GPU')
     parser.add_argument('--workers', type=int, default=4,
                         help='Number of data loading workers')
@@ -752,7 +771,7 @@ if __name__ == '__main__':
     parser.add_argument('--optimizer', type=str, default='sgd', 
                         choices=['sgd', 'adamw'],
                         help='Optimizer')
-    parser.add_argument('--lr', type=float, default=0.001,
+    parser.add_argument('--lr', type=float, default=0.00025,
                         help='Initial learning rate')
     parser.add_argument('--weight-decay', type=float, default=0.0005,
                         help='Weight decay')
