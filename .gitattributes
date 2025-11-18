@@ -6,5 +6,8 @@ yolo/prepared_data/** filter=lfs diff=lfs merge=lfs -text
 rcnn/runs/rcnn/** filter=lfs diff=lfs merge=lfs -text
 *.jpg filter=lfs diff=lfs merge=lfs -text
 *.png filter=lfs diff=lfs merge=lfs -text
+rcnn/data/** filter=lfs diff=lfs merge=lfs -text
+yolo/yolov9/** filter=lfs diff=lfs merge=lfs -text
+*.zip filter=lfs diff=lfs merge=lfs -text
 *.jpg !text !filter !merge !diff
 *.png !text !filter !merge !diff

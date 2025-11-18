@@ -1,6 +1,7 @@
 """
-CARPK Parking Dataset Preparation - PRODUCTION VERSION
+CARPK Parking Dataset Preparation - PRODUCTION VERSION (FIXED)
 Robust handling of HuggingFace dataset with comprehensive error checking
+FIXED: Added required COCO JSON fields (info, licenses)
 """
 
 import os
@@ -12,6 +13,7 @@ from datasets import load_dataset
 from PIL import Image
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
+from datetime import datetime
 
 class CARPKDataPreparation:
     def __init__(self, output_dir='./data', train_split=0.7, val_split=0.2):
@@ -261,8 +263,26 @@ class CARPKDataPreparation:
             return None, None, annotation_id
     
     def create_coco_json(self, split, images, annotations):
-        """Create COCO format JSON"""
+        """
+        Create COCO format JSON with all required fields
+        FIXED: Added 'info' and 'licenses' fields required by pycocotools
+        """
         coco_format = {
+            'info': {
+                'description': 'CARPK Parking Dataset',
+                'url': 'https://huggingface.co/datasets/backseollgi/parking_dataset',
+                'version': '1.0',
+                'year': datetime.now().year,
+                'contributor': 'CARPK Dataset Preparation Script',
+                'date_created': datetime.now().strftime('%Y/%m/%d')
+            },
+            'licenses': [
+                {
+                    'id': 1,
+                    'name': 'Unknown',
+                    'url': ''
+                }
+            ],
             'images': images,
             'annotations': annotations,
             'categories': [
@@ -388,7 +408,7 @@ class CARPKDataPreparation:
     def prepare_dataset(self, max_samples=None, test_first=True):
         """Main preparation function"""
         print("="*70)
-        print("CARPK Dataset Preparation - PRODUCTION VERSION")
+        print("CARPK Dataset Preparation - PRODUCTION VERSION (FIXED)")
         print("="*70)
         
         # Create directories
@@ -525,7 +545,7 @@ class CARPKDataPreparation:
         print("\n📝 Next steps:")
         print("  1. Review the visualization images to verify data quality")
         print("  2. Use the recommended anchor sizes when training")
-        print("  3. Start training with: python train_rcnn_v2.py")
+        print("  3. Start training with: python train_rcnn.py")
     
     def print_statistics(self):
         """Print comprehensive statistics"""
@@ -568,7 +588,7 @@ class CARPKDataPreparation:
 if __name__ == "__main__":
     import argparse
     
-    parser = argparse.ArgumentParser(description='Prepare CARPK Dataset for Faster R-CNN')
+    parser = argparse.ArgumentParser(description='Prepare CARPK Dataset for Faster R-CNN (FIXED)')
     parser.add_argument('--output-dir', type=str, default='./data',
                         help='Output directory for processed data')
     parser.add_argument('--train-split', type=float, default=0.7,

@@ -1,6 +1,7 @@
 """
-Faster R-CNN Training Script - PRODUCTION VERSION
-All critical issues fixed with robust error handling
+Faster R-CNN Training Script - Production Version with Fixed Evaluation
+Training script with robust error handling and validation
+FIXED: Category ID mismatch causing zero AP scores
 """
 
 import os
@@ -25,7 +26,8 @@ print(f"PyTorch version: {torch.__version__}")
 
 class COCODataset(torch.utils.data.Dataset):
     """
-    FIXED: Properly handles transforms and validates all data
+    Custom dataset for loading COCO format annotations.
+    Handles transforms and validates all data during initialization.
     """
     def __init__(self, json_file, img_dir, transforms=None):
         from pycocotools.coco import COCO
@@ -34,11 +36,11 @@ class COCODataset(torch.utils.data.Dataset):
         self.transforms = transforms
         
         # Load COCO annotations
-        print(f"📂 Loading annotations from {json_file}...")
+        print(f"Loading annotations from {json_file}...")
         try:
             self.coco = COCO(str(json_file))
         except Exception as e:
-            print(f"❌ Failed to load COCO file: {e}")
+            print(f"Error: Failed to load COCO file: {e}")
             raise
         
         self.ids = list(sorted(self.coco.imgs.keys()))
@@ -46,7 +48,7 @@ class COCODataset(torch.utils.data.Dataset):
         # Validate dataset
         self._validate_dataset()
         
-        print(f"✓ Loaded {len(self.ids)} images from {json_file}")
+        print(f"Loaded {len(self.ids)} images from {json_file}")
     
     def _validate_dataset(self):
         """Validate dataset integrity"""
@@ -75,16 +77,16 @@ class COCODataset(torch.utils.data.Dataset):
             total_boxes += valid_boxes
         
         if images_without_boxes > 0:
-            print(f"   ⚠️  {images_without_boxes} images have no annotations")
+            print(f"   Warning: {images_without_boxes} images have no annotations")
         
         if images_with_invalid_boxes > 0:
-            print(f"   ⚠️  {images_with_invalid_boxes} images have only invalid boxes")
+            print(f"   Warning: {images_with_invalid_boxes} images have only invalid boxes")
         
         valid_images = len(self.ids) - images_without_boxes - images_with_invalid_boxes
         
-        print(f"   ✓ Valid images: {valid_images}")
-        print(f"   ✓ Total annotations: {total_boxes}")
-        print(f"   ✓ Avg boxes/image: {total_boxes/len(self.ids):.2f}")
+        print(f"   Valid images: {valid_images}")
+        print(f"   Total annotations: {total_boxes}")
+        print(f"   Avg boxes/image: {total_boxes/len(self.ids):.2f}")
         
         if valid_images == 0:
             raise ValueError("No valid images found in dataset!")
@@ -101,7 +103,7 @@ class COCODataset(torch.utils.data.Dataset):
         try:
             img = Image.open(img_path).convert('RGB')
         except Exception as e:
-            print(f"⚠️  Failed to load image {img_path}: {e}")
+            print(f"Warning: Failed to load image {img_path}: {e}")
             # Return a dummy sample
             img = Image.new('RGB', (640, 480))
             coco_anns = []
@@ -118,6 +120,9 @@ class COCODataset(torch.utils.data.Dataset):
             # COCO bbox is [x, y, width, height]
             # PyTorch needs [x1, y1, x2, y2]
             boxes.append([x, y, x + w, y + h])
+            
+            # FIXED: Faster R-CNN expects labels starting from 1 (0 is background)
+            # Since category_id in dataset is already 1, we can use it directly
             labels.append(ann['category_id'])
             areas.append(ann['area'])
         
@@ -154,8 +159,9 @@ class COCODataset(torch.utils.data.Dataset):
 
 def get_transform(train=False):
     """
-    FIXED: Simple transforms that work with detection models
-    Only normalize the image - augmentations handled by model
+    Create image transforms for the model.
+    Simple transforms that work with detection models.
+    Only normalizes the image - augmentations handled by model.
     """
     transforms = []
     
@@ -181,7 +187,7 @@ def get_model(num_classes, anchor_sizes=None, pretrained=True):
         pretrained: Use pretrained backbone
     """
     print("\n" + "="*70)
-    print("🏗️  Creating Model")
+    print("Creating Model")
     print("="*70)
     
     # Load pretrained ResNet-50 FPN backbone
@@ -189,18 +195,18 @@ def get_model(num_classes, anchor_sizes=None, pretrained=True):
         try:
             weights = torchvision.models.detection.FasterRCNN_ResNet50_FPN_V2_Weights.DEFAULT
             model = torchvision.models.detection.fasterrcnn_resnet50_fpn_v2(weights=weights)
-            print("✓ Loaded pretrained weights (FasterRCNN_ResNet50_FPN_V2)")
+            print("Loaded pretrained weights (FasterRCNN_ResNet50_FPN_V2)")
         except AttributeError:
             # Fallback for older torchvision versions
             weights = torchvision.models.detection.FasterRCNN_ResNet50_FPN_Weights.DEFAULT
             model = torchvision.models.detection.fasterrcnn_resnet50_fpn(weights=weights)
-            print("✓ Loaded pretrained weights (FasterRCNN_ResNet50_FPN)")
+            print("Loaded pretrained weights (FasterRCNN_ResNet50_FPN)")
     else:
         try:
             model = torchvision.models.detection.fasterrcnn_resnet50_fpn_v2(weights=None)
         except AttributeError:
             model = torchvision.models.detection.fasterrcnn_resnet50_fpn(weights=None)
-        print("✓ Initialized model from scratch (NOT recommended)")
+        print("Initialized model from scratch (NOT recommended)")
     
     # Custom anchor generator if provided
     if anchor_sizes is not None:
@@ -210,15 +216,15 @@ def get_model(num_classes, anchor_sizes=None, pretrained=True):
             aspect_ratios=aspect_ratios
         )
         model.rpn.anchor_generator = anchor_generator
-        print(f"✓ Custom RPN anchors: {anchor_sizes}")
+        print(f"Custom RPN anchors: {anchor_sizes}")
         print(f"  Aspect ratios: {aspect_ratios[0]}")
     else:
-        print(f"✓ Using default anchors")
+        print(f"Using default anchors")
     
     # Replace box predictor head for our number of classes
     in_features = model.roi_heads.box_predictor.cls_score.in_features
     model.roi_heads.box_predictor = FastRCNNPredictor(in_features, num_classes)
-    print(f"✓ Replaced box predictor for {num_classes} classes")
+    print(f"Replaced box predictor for {num_classes} classes")
     
     return model
 
@@ -250,7 +256,7 @@ def train_one_epoch(model, optimizer, data_loader, device, epoch, scaler=None):
             images = [img.to(device) for img in images]
             targets = [{k: v.to(device) for k, v in t.items()} for t in targets]
             
-            # Filter out images with no boxes (CRITICAL FIX)
+            # Filter out images with no boxes to prevent training errors
             valid_idx = [i for i, t in enumerate(targets) if len(t['boxes']) > 0]
             if len(valid_idx) == 0:
                 num_skipped += 1
@@ -267,7 +273,7 @@ def train_one_epoch(model, optimizer, data_loader, device, epoch, scaler=None):
                 
                 # Check for NaN
                 if torch.isnan(losses) or torch.isinf(losses):
-                    print(f"\n⚠️  NaN/Inf loss detected, skipping batch")
+                    print(f"\nWarning: NaN/Inf loss detected, skipping batch")
                     num_skipped += 1
                     continue
                 
@@ -287,7 +293,7 @@ def train_one_epoch(model, optimizer, data_loader, device, epoch, scaler=None):
                 
                 # Check for NaN
                 if torch.isnan(losses) or torch.isinf(losses):
-                    print(f"\n⚠️  NaN/Inf loss detected, skipping batch")
+                    print(f"\nWarning: NaN/Inf loss detected, skipping batch")
                     num_skipped += 1
                     continue
                 
@@ -317,7 +323,7 @@ def train_one_epoch(model, optimizer, data_loader, device, epoch, scaler=None):
             })
             
         except RuntimeError as e:
-            print(f"\n⚠️  Runtime error in batch: {e}")
+            print(f"\nWarning: Runtime error in batch: {e}")
             num_skipped += 1
             continue
     
@@ -330,7 +336,7 @@ def train_one_epoch(model, optimizer, data_loader, device, epoch, scaler=None):
             print(f"    {k}: {v/num_batches:.4f}")
     
     if num_skipped > 0:
-        print(f"  ⚠️  Skipped {num_skipped} batches due to errors")
+        print(f"  Warning: Skipped {num_skipped} batches due to errors")
     
     return avg_loss
 
@@ -339,6 +345,7 @@ def train_one_epoch(model, optimizer, data_loader, device, epoch, scaler=None):
 def evaluate(model, data_loader, device, coco_gt):
     """
     Evaluate using official COCO metrics with error handling
+    FIXED: Proper category ID mapping to prevent zero AP scores
     """
     from pycocotools.cocoeval import COCOeval
     
@@ -346,6 +353,8 @@ def evaluate(model, data_loader, device, coco_gt):
     
     coco_results = []
     num_errors = 0
+    num_predictions = 0
+    num_background_filtered = 0
     
     pbar = tqdm(data_loader, desc="Evaluating")
     
@@ -372,6 +381,12 @@ def evaluate(model, data_loader, device, coco_gt):
                 labels = labels[mask]
                 
                 for box, score, label in zip(boxes, scores, labels):
+                    # FIXED: Skip background predictions (label 0)
+                    # Faster R-CNN outputs: 0=background, 1=car, etc.
+                    if label == 0:
+                        num_background_filtered += 1
+                        continue
+                    
                     # Convert [x1, y1, x2, y2] to [x, y, w, h]
                     x1, y1, x2, y2 = box
                     w = x2 - x1
@@ -381,22 +396,49 @@ def evaluate(model, data_loader, device, coco_gt):
                     if w <= 0 or h <= 0:
                         continue
                     
+                    # FIXED: Always use category_id=1 for car
+                    # This matches the category_id in the ground truth annotations
                     coco_results.append({
                         'image_id': int(image_id),
-                        'category_id': int(label),
+                        'category_id': 1,  # Always 1 for car (matches ground truth)
                         'bbox': [float(x1), float(y1), float(w), float(h)],
                         'score': float(score)
                     })
+                    num_predictions += 1
         
         except Exception as e:
             num_errors += 1
             pbar.set_postfix({'errors': num_errors})
             continue
     
+    # Debug information
+    print(f"\nEvaluation Summary:")
+    print(f"  Total predictions: {num_predictions}")
+    print(f"  Background filtered: {num_background_filtered}")
+    print(f"  Errors: {num_errors}")
+    
     # Evaluate with COCO API
     if len(coco_results) == 0:
-        print("\n⚠️  No predictions made!")
+        print("\n⚠️  WARNING: No predictions made!")
+        print("  Possible reasons:")
+        print("    - Score threshold too high")
+        print("    - Model not learning (check training loss)")
+        print("    - All predictions are background")
         return 0.0, 0.0, 0.0
+    
+    # Additional debug info
+    print(f"  Sample prediction: {coco_results[0]}")
+    category_ids = set(r['category_id'] for r in coco_results)
+    print(f"  Category IDs in predictions: {category_ids}")
+    
+    # Get ground truth category IDs for comparison
+    gt_category_ids = set(ann['category_id'] for ann in coco_gt.dataset['annotations'])
+    print(f"  Category IDs in ground truth: {gt_category_ids}")
+    
+    if category_ids != gt_category_ids:
+        print(f"  ⚠️  WARNING: Category ID mismatch!")
+        print(f"     Predictions: {category_ids}")
+        print(f"     Ground truth: {gt_category_ids}")
     
     try:
         coco_dt = coco_gt.loadRes(coco_results)
@@ -413,8 +455,10 @@ def evaluate(model, data_loader, device, coco_gt):
         return map_50_95, ap50, ap75
         
     except Exception as e:
-        print(f"\n⚠️  COCO evaluation failed: {e}")
+        print(f"\n⚠️  WARNING: COCO evaluation failed: {e}")
         print(f"    Generated {len(coco_results)} predictions")
+        import traceback
+        traceback.print_exc()
         return 0.0, 0.0, 0.0
 
 
@@ -437,12 +481,12 @@ def save_checkpoint(model, optimizer, scheduler, epoch, metrics, output_dir, fil
 
 def main(args):
     print("="*70)
-    print("🚀 Faster R-CNN Training - PRODUCTION VERSION")
+    print("Faster R-CNN Training - Production Version (FIXED)")
     print("="*70)
     
     # Setup device
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    print(f"\n🖥️  Device: {device}")
+    print(f"\nDevice: {device}")
     
     if torch.cuda.is_available():
         print(f"   GPU: {torch.cuda.get_device_name(0)}")
@@ -458,19 +502,19 @@ def main(args):
         json.dump(vars(args), f, indent=2)
     
     # Load datasets
-    print("\n📚 Loading Datasets")
+    print("\nLoading Datasets")
     print("="*70)
     
     data_path = Path(args.data_dir)
     
     # Verify data exists
     if not (data_path / 'train.json').exists():
-        print(f"❌ Training data not found at {data_path / 'train.json'}")
+        print(f"Error: Training data not found at {data_path / 'train.json'}")
         print("   Please run prepare_dataset.py first!")
         return
     
     if not (data_path / 'val.json').exists():
-        print(f"❌ Validation data not found at {data_path / 'val.json'}")
+        print(f"Error: Validation data not found at {data_path / 'val.json'}")
         print("   Please run prepare_dataset.py first!")
         return
     
@@ -487,10 +531,10 @@ def main(args):
             transforms=get_transform(train=False)
         )
     except Exception as e:
-        print(f"❌ Failed to load datasets: {e}")
+        print(f"Error: Failed to load datasets: {e}")
         return
     
-    # Data loaders (FIXED: persistent_workers compatibility)
+    # Data loaders with persistent_workers compatibility check
     use_persistent_workers = args.workers > 0 and TORCH_VERSION >= (1, 7)
     
     train_loader = torch.utils.data.DataLoader(
@@ -513,22 +557,22 @@ def main(args):
         persistent_workers=use_persistent_workers
     )
     
-    print(f"\n✓ DataLoaders created:")
+    print(f"\nDataLoaders created:")
     print(f"  Workers: {args.workers}")
     print(f"  Persistent workers: {use_persistent_workers}")
     print(f"  Batch size: {args.batch_size}")
     
     # Create model
-    num_classes = 2  # Background + car
+    num_classes = 2  # Background + car (Faster R-CNN handles background automatically)
     
     # Parse anchor sizes if provided
     anchor_sizes = None
     if args.anchor_sizes:
         try:
             anchor_sizes = tuple(tuple([int(s)]) for s in args.anchor_sizes.split(','))
-            print(f"\n🎯 Using custom anchor sizes: {anchor_sizes}")
+            print(f"\nUsing custom anchor sizes: {anchor_sizes}")
         except Exception as e:
-            print(f"⚠️  Failed to parse anchor sizes: {e}")
+            print(f"Warning: Failed to parse anchor sizes: {e}")
             print(f"   Using default anchors instead")
     
     model = get_model(
@@ -541,7 +585,7 @@ def main(args):
     # Count parameters
     total_params = sum(p.numel() for p in model.parameters())
     trainable_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
-    print(f"\n📊 Model Parameters:")
+    print(f"\nModel Parameters:")
     print(f"  Total: {total_params:,}")
     print(f"  Trainable: {trainable_params:,}")
     
@@ -555,14 +599,14 @@ def main(args):
             momentum=0.9,
             weight_decay=args.weight_decay
         )
-        print(f"\n✓ Using SGD optimizer")
+        print(f"\nUsing SGD optimizer")
     else:
         optimizer = torch.optim.AdamW(
             params,
             lr=args.lr,
             weight_decay=args.weight_decay
         )
-        print(f"\n✓ Using AdamW optimizer")
+        print(f"\nUsing AdamW optimizer")
     
     print(f"  Learning rate: {args.lr}")
     print(f"  Weight decay: {args.weight_decay}")
@@ -574,7 +618,7 @@ def main(args):
             step_size=args.lr_step_size,
             gamma=args.lr_gamma
         )
-        print(f"✓ Using StepLR scheduler")
+        print(f"Using StepLR scheduler")
         print(f"  Step size: {args.lr_step_size}")
         print(f"  Gamma: {args.lr_gamma}")
     elif args.scheduler == 'cosine':
@@ -583,7 +627,7 @@ def main(args):
             T_max=args.epochs,
             eta_min=1e-6
         )
-        print(f"✓ Using CosineAnnealingLR scheduler")
+        print(f"Using CosineAnnealingLR scheduler")
     else:  # multistep
         milestones = [int(args.epochs * 0.6), int(args.epochs * 0.8)]
         lr_scheduler = torch.optim.lr_scheduler.MultiStepLR(
@@ -591,21 +635,21 @@ def main(args):
             milestones=milestones,
             gamma=0.1
         )
-        print(f"✓ Using MultiStepLR scheduler")
+        print(f"Using MultiStepLR scheduler")
         print(f"  Milestones: {milestones}")
     
-    # Mixed precision training (FIXED: proper compatibility check)
+    # Mixed precision training with proper compatibility check
     scaler = None
     if args.amp and torch.cuda.is_available():
         if hasattr(torch.cuda.amp, 'GradScaler'):
             scaler = torch.cuda.amp.GradScaler()
-            print("✓ Using mixed precision training (AMP)")
+            print("Using mixed precision training (AMP)")
         else:
-            print("⚠️  AMP not available in this PyTorch version")
+            print("Warning: AMP not available in this PyTorch version")
     
     # Training loop
     print("\n" + "="*70)
-    print("🏋️  Training")
+    print("Training")
     print("="*70)
     
     best_map = 0.0
@@ -637,7 +681,7 @@ def main(args):
             current_lr = optimizer.param_groups[0]['lr']
             
             # Evaluate
-            print(f"\n📊 Evaluating Epoch {epoch}")
+            print(f"\nEvaluating Epoch {epoch}")
             val_map, ap50, ap75 = evaluate(model, val_loader, device, val_dataset.coco)
             
             # Save history
@@ -678,7 +722,7 @@ def main(args):
                 
                 save_path = save_checkpoint(model, optimizer, lr_scheduler, epoch, 
                                            metrics, output_dir, 'best.pt')
-                print(f"🎉 New best model saved!")
+                print(f"✅ New best model saved!")
                 print(f"   mAP@[.5:.95]: {best_map:.4f}")
                 print(f"   AP@0.50: {best_ap50:.4f}")
                 print(f"   AP@0.75: {best_ap75:.4f}")
@@ -689,7 +733,7 @@ def main(args):
             
             # Early stopping
             if epochs_no_improve >= args.patience:
-                print(f"\n⏹️  Early stopping triggered after {args.patience} epochs without improvement")
+                print(f"\nEarly stopping triggered after {args.patience} epochs without improvement")
                 break
             
             # Save periodic checkpoint
@@ -698,10 +742,10 @@ def main(args):
                               output_dir, f'checkpoint_epoch_{epoch}.pt')
     
     except KeyboardInterrupt:
-        print("\n⚠️  Training interrupted by user")
+        print("\nWarning: Training interrupted by user")
     
     except Exception as e:
-        print(f"\n❌ Training failed with error: {e}")
+        print(f"\nError: Training failed with error: {e}")
         import traceback
         traceback.print_exc()
     
@@ -711,7 +755,7 @@ def main(args):
             json.dump(history, f, indent=2)
         
         print("\n" + "="*70)
-        print("✅ Training Complete!")
+        print("Training Complete!")
         print("="*70)
         print(f"Best Results:")
         print(f"  mAP@[.5:.95]: {best_map:.4f}")
@@ -724,7 +768,7 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
-        description='Faster R-CNN Training - Production Version',
+        description='Faster R-CNN Training - Production Version (FIXED)',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
     
@@ -743,7 +787,7 @@ if __name__ == '__main__':
     # Training
     parser.add_argument('--epochs', type=int, default=50,
                         help='Number of training epochs')
-    parser.add_argument('--batch-size', type=int, default=4,
+    parser.add_argument('--batch-size', type=int, default=6,
                         help='Batch size per GPU')
     parser.add_argument('--workers', type=int, default=4,
                         help='Number of data loading workers')
@@ -776,11 +820,11 @@ if __name__ == '__main__':
     
     # Validate arguments
     if args.batch_size < 1:
-        print("❌ Batch size must be at least 1")
+        print("Error: Batch size must be at least 1")
         sys.exit(1)
     
     if args.lr <= 0:
-        print("❌ Learning rate must be positive")
+        print("Error: Learning rate must be positive")
         sys.exit(1)
     
     main(args)

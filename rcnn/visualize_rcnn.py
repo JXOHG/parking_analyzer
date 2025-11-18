@@ -1,98 +1,124 @@
-"""
-R-CNN Prediction Visualizer (v2 - Import Fix)
-
-This script loads your trained Faster R-CNN model, runs it on a random
-image from the validation set, and saves the output with bounding boxes drawn on it.
-"""
 import torch
-import torchvision
+import numpy as np
 from pathlib import Path
-from PIL import Image, ImageDraw, ImageFont
-import random
-import argparse
 
-def visualize_predictions(checkpoint_path, data_dir, output_path, conf_threshold=0.3):
-    print("="*70)
-    print("R-CNN Prediction Visualizer")
-    print("="*70)
+# Load model
+checkpoint = torch.load('./runs/rcnn/best.pt', map_location=device)
+model.load_state_dict(checkpoint['model_state_dict'])
+model.eval()
+model.to(device)
 
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    print(f"🖥️  Using device: {device}")
+# Get one validation sample
+test_images, test_targets = next(iter(val_loader))
 
-    # 1. Define the V1 model architecture with the CORRECT import path
-    print("🏗️  Creating V1 model structure...")
-    from torchvision.models.detection import fasterrcnn_resnet50_fpn
-    # --- THIS IS THE FIX ---
-    from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
-    # --- END OF FIX ---
-    model = fasterrcnn_resnet50_fpn(weights=None, weights_backbone=None)
-    num_classes = 2 # 1 class (car) + 1 background
-    in_features = model.roi_heads.box_predictor.cls_score.in_features
-    model.roi_heads.box_predictor = FastRCNNPredictor(in_features, num_classes)
+print("="*70)
+print("Prediction Format Check")
+print("="*70)
 
-    # 2. Load the checkpoint
-    print(f"💾 Loading checkpoint from: {checkpoint_path}")
-    checkpoint = torch.load(checkpoint_path, map_location=device)
-    model.load_state_dict(checkpoint['model_state_dict'], strict=False)
-    print("✓ Checkpoint loaded successfully.")
+with torch.no_grad():
+    test_images_gpu = [test_images[0].to(device)]
+    outputs = model(test_images_gpu)
 
-    # 3. Set the score threshold
-    model.roi_heads.score_thresh = conf_threshold
-    model.to(device).eval()
-    print(f"⚙️  Confidence threshold set to: {conf_threshold}")
+# Check prediction
+pred_boxes = outputs[0]['boxes'].cpu().numpy()
+pred_scores = outputs[0]['scores'].cpu().numpy()
 
-    # 4. Pick a random validation image
-    val_images_dir = Path(data_dir) / 'val'
-    image_paths = list(val_images_dir.glob("*.jpg"))
-    if not image_paths:
-        raise FileNotFoundError(f"No images found in {val_images_dir}")
+print(f"\nPredictions made: {len(pred_boxes)}")
+print(f"Max score: {pred_scores.max():.4f}")
+
+# Check ground truth
+gt_boxes = test_targets[0]['boxes'].cpu().numpy()
+img_id = test_targets[0]['image_id'].item()
+img_info = val_dataset.coco.loadImgs(img_id)[0]
+
+print(f"\nGround truth boxes: {len(gt_boxes)}")
+print(f"Image size: {img_info['width']}x{img_info['height']}")
+
+# Check the actual annotations in COCO
+ann_ids = val_dataset.coco.getAnnIds(imgIds=img_id)
+coco_anns = val_dataset.coco.loadAnns(ann_ids)
+
+print(f"\nCOCO annotations: {len(coco_anns)}")
+print(f"\nFirst COCO annotation (from JSON):")
+print(f"  bbox: {coco_anns[0]['bbox']} (format: [x, y, w, h])")
+
+print(f"\nFirst ground truth box (loaded by dataset):")
+print(f"  bbox: {gt_boxes[0]} (format: [x1, y1, x2, y2])")
+
+print(f"\nFirst prediction:")
+print(f"  bbox: {pred_boxes[0]} (format: [x1, y1, x2, y2])")
+
+# Now convert prediction to COCO format (what evaluation does)
+x1, y1, x2, y2 = pred_boxes[0]
+coco_pred = [x1, y1, x2-x1, y2-y1]  # Convert to [x, y, w, h]
+print(f"  COCO format: {coco_pred} (format: [x, y, w, h])")
+
+# CRITICAL: Check if the conversion matches what evaluation script does
+print("\n" + "="*70)
+print("CRITICAL CHECK: Bbox Conversion in Evaluation")
+print("="*70)
+
+print("\nIn your evaluation code, predictions are converted like this:")
+print("  x1, y1, x2, y2 = box")
+print("  w = x2 - x1")
+print("  h = y2 - y1")
+print("  coco_bbox = [float(x1), float(y1), float(w), float(h)]")
+
+print("\n⚠️  WAIT! This is WRONG!")
+print("COCO format is: [x, y, width, height]")
+print("Your code does:  [x1, y1, width, height]")
+print("But x1, y1 are already top-left corner, so this should be correct...")
+
+# Actually test IoU
+def compute_iou(box1, box2):
+    """Compute IoU between two boxes in [x1, y1, x2, y2] format"""
+    x1_1, y1_1, x2_1, y2_1 = box1
+    x1_2, y1_2, x2_2, y2_2 = box2
     
-    random_img_path = random.choice(image_paths)
-    print(f"🖼️  Selected random image for prediction: {random_img_path.name}")
-    img = Image.open(random_img_path).convert("RGB")
-
-    # 5. Preprocess the image
-    transform = torchvision.transforms.Compose([
-        torchvision.transforms.ToTensor(),
-        torchvision.transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-    ])
-    img_tensor = transform(img).to(device)
-
-    # 6. Run prediction
-    print("🧠 Running model inference...")
-    with torch.no_grad():
-        prediction = model([img_tensor])
+    # Intersection
+    x1_i = max(x1_1, x1_2)
+    y1_i = max(y1_1, y1_2)
+    x2_i = min(x2_1, x2_2)
+    y2_i = min(y2_1, y2_2)
     
-    boxes = prediction[0]['boxes'].cpu().numpy()
-    scores = prediction[0]['scores'].cpu().numpy()
+    if x2_i < x1_i or y2_i < y1_i:
+        return 0.0
     
-    print(f"👍 Found {len(boxes)} predictions with score > {conf_threshold}")
+    inter_area = (x2_i - x1_i) * (y2_i - y1_i)
+    
+    # Union
+    box1_area = (x2_1 - x1_1) * (y2_1 - y1_1)
+    box2_area = (x2_2 - x1_2) * (y2_2 - y1_2)
+    union_area = box1_area + box2_area - inter_area
+    
+    return inter_area / union_area if union_area > 0 else 0.0
 
-    # 7. Draw boxes on the image
-    draw = ImageDraw.Draw(img)
-    try:
-        font = ImageFont.truetype("arial.ttf", 15)
-    except IOError:
-        font = ImageFont.load_default()
+# Compute IoUs between predictions and ground truth
+print("\n" + "="*70)
+print("IoU Analysis")
+print("="*70)
 
-    for box, score in zip(boxes, scores):
-        x1, y1, x2, y2 = box
-        draw.rectangle([(x1, y1), (x2, y2)], outline="red", width=3)
-        text = f"{score:.2f}"
-        text_bbox = draw.textbbox((x1, y1 - 15), text, font=font)
-        draw.rectangle(text_bbox, fill="red")
-        draw.text((x1, y1 - 15), text, font=font, fill="white")
+high_conf_mask = pred_scores > 0.5
+high_conf_preds = pred_boxes[high_conf_mask]
 
-    # 8. Save the output
-    img.save(output_path)
-    print(f"\n✅ Prediction saved to: {output_path}")
-    print("="*70)
+print(f"\nHigh confidence predictions: {len(high_conf_preds)}")
+print(f"Ground truth boxes: {len(gt_boxes)}")
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Visualize R-CNN Predictions")
-    parser.add_argument('--checkpoint', type=str, default='./rcnn/runs/faster_rcnn/best.pt', help='Path to the R-CNN model checkpoint')
-    parser.add_argument('--data-dir', type=str, default='./rcnn/prepared_data/coco', help='Path to the COCO data directory')
-    parser.add_argument('--output', type=str, default='rcnn_prediction.jpg', help='Path to save the output image')
-    parser.add_argument('--threshold', type=float, default=0.5, help='Confidence threshold for displaying boxes')
-    args = parser.parse_args()
-    visualize_predictions(args.checkpoint, args.data_dir, args.output, args.threshold)
+# Find best IoU for each GT box
+ious_matrix = np.zeros((len(gt_boxes), len(high_conf_preds)))
+
+for i, gt_box in enumerate(gt_boxes):
+    for j, pred_box in enumerate(high_conf_preds):
+        ious_matrix[i, j] = compute_iou(gt_box, pred_box)
+
+if ious_matrix.size > 0:
+    print(f"\nIoU statistics:")
+    print(f"  Max IoU: {ious_matrix.max():.4f}")
+    print(f"  Mean IoU (best match per GT): {ious_matrix.max(axis=1).mean():.4f}")
+    print(f"  GTs with IoU>0.5: {(ious_matrix.max(axis=1) > 0.5).sum()}/{len(gt_boxes)}")
+    print(f"  GTs with IoU>0.75: {(ious_matrix.max(axis=1) > 0.75).sum()}/{len(gt_boxes)}")
+    
+    if ious_matrix.max() < 0.3:
+        print("\n❌ PROBLEM FOUND: IoU is very low!")
+        print("   Predictions don't overlap with ground truth at all!")
+        print("   This suggests a coordinate system mismatch.")

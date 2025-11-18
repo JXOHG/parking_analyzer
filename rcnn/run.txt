@@ -1,0 +1,999 @@
+======================================================================
+Epoch 13 Summary:
+  Train Loss: 0.1649
+  Val mAP@[.5:.95]: 0.8186
+  Val AP@0.50: 0.9894
+  Val AP@0.75: 0.9769
+  Learning Rate: 0.001000
+======================================================================
+No improvement for 2 epoch(s)
+Best AP@0.50: 0.9895
+
+======================================================================
+Epoch 14/50
+======================================================================
+Epoch 14 [Train]: 100%|██████████████████████| 116/116 [1:05:18<00:00, 33.78s/it, loss=0.1802, avg=0.1642, skip=0] 
+
+  Loss breakdown:
+    loss_classifier: 0.0421
+    loss_box_reg: 0.1092
+    loss_objectness: 0.0016
+    loss_rpn_box_reg: 0.0113
+
+Evaluating Epoch 14
+Evaluating: 100%|█████████████████████████████████████████████████████████████████| 33/33 [02:50<00:00,  5.16s/it] 
+
+Evaluation Summary:
+  Total predictions: 8842
+  Background filtered: 0
+  Errors: 0
+  Sample prediction: {'image_id': 692, 'category_id': 1, 'bbox': [813.4729614257812, 291.46246337890625, 105.852783203125, 46.45928955078125], 'score': 0.999683141708374}
+  Category IDs in predictions: {1}
+  Category IDs in ground truth: {1}
+Loading and preparing results...
+DONE (t=0.00s)
+creating index...
+index created!
+Running per image evaluation...
+Evaluate annotation type *bbox*
+DONE (t=5.79s).
+Accumulating evaluation results...
+DONE (t=0.08s).
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.823
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.989
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.987
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.506
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.823
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.869
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.021
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.202
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.862
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.640
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.863
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.895
+
+======================================================================
+Epoch 14 Summary:
+  Train Loss: 0.1642
+  Val mAP@[.5:.95]: 0.8230
+  Val AP@0.50: 0.9894
+  Val AP@0.75: 0.9871
+  Learning Rate: 0.001000
+======================================================================
+No improvement for 3 epoch(s)
+Best AP@0.50: 0.9895
+
+======================================================================
+Epoch 15/50
+======================================================================
+Epoch 15 [Train]: 100%|██████████████████████| 116/116 [1:05:21<00:00, 33.81s/it, loss=0.1580, avg=0.1608, skip=0] 
+
+  Loss breakdown:
+    loss_classifier: 0.0409
+    loss_box_reg: 0.1072
+    loss_objectness: 0.0017
+    loss_rpn_box_reg: 0.0110
+
+Evaluating Epoch 15
+Evaluating: 100%|█████████████████████████████████████████████████████████████████| 33/33 [03:06<00:00,  5.64s/it] 
+
+Evaluation Summary:
+  Total predictions: 8802
+  Background filtered: 0
+  Errors: 0
+  Sample prediction: {'image_id': 692, 'category_id': 1, 'bbox': [966.4318237304688, 294.3860778808594, 82.79022216796875, 106.43365478515625], 'score': 0.9997105002403259}
+  Category IDs in predictions: {1}
+  Category IDs in ground truth: {1}
+Loading and preparing results...
+DONE (t=0.00s)
+creating index...
+index created!
+Running per image evaluation...
+Evaluate annotation type *bbox*
+DONE (t=5.90s).
+Accumulating evaluation results...
+DONE (t=0.08s).
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.823
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.989
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.987
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.501
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.823
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.857
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.021
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.202
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.862
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.630
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.863
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.886
+
+======================================================================
+Epoch 15 Summary:
+  Train Loss: 0.1608
+  Val mAP@[.5:.95]: 0.8234
+  Val AP@0.50: 0.9894
+  Val AP@0.75: 0.9869
+  Learning Rate: 0.000100
+======================================================================
+No improvement for 4 epoch(s)
+Best AP@0.50: 0.9895
+
+======================================================================
+Epoch 16/50
+======================================================================
+Epoch 16 [Train]: 100%|██████████████████████| 116/116 [1:05:22<00:00, 33.82s/it, loss=0.1623, avg=0.1569, skip=0] 
+
+  Loss breakdown:
+    loss_classifier: 0.0408
+    loss_box_reg: 0.1038
+    loss_objectness: 0.0016
+    loss_rpn_box_reg: 0.0107
+
+Evaluating Epoch 16
+Evaluating: 100%|█████████████████████████████████████████████████████████████████| 33/33 [02:50<00:00,  5.16s/it] 
+
+Evaluation Summary:
+  Total predictions: 8804
+  Background filtered: 0
+  Errors: 0
+  Sample prediction: {'image_id': 692, 'category_id': 1, 'bbox': [965.5846557617188, 293.3814697265625, 82.97894287109375, 105.69631958007812], 'score': 0.9997500777244568}
+  Category IDs in predictions: {1}
+  Category IDs in ground truth: {1}
+Loading and preparing results...
+DONE (t=0.01s)
+creating index...
+index created!
+Running per image evaluation...
+Evaluate annotation type *bbox*
+DONE (t=5.99s).
+Accumulating evaluation results...
+DONE (t=0.07s).
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.823
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.989
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.987
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.509
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.823
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.852
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.021
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.202
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.862
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.646
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.863
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.886
+
+======================================================================
+Epoch 16 Summary:
+  Train Loss: 0.1569
+  Val mAP@[.5:.95]: 0.8228
+  Val AP@0.50: 0.9895
+  Val AP@0.75: 0.9871
+  Learning Rate: 0.000100
+======================================================================
+✅ New best model saved!
+   mAP@[.5:.95]: 0.8228
+   AP@0.50: 0.9895
+   AP@0.75: 0.9871
+
+======================================================================
+Epoch 17/50
+======================================================================
+Epoch 17 [Train]: 100%|██████████████████████| 116/116 [1:05:18<00:00, 33.78s/it, loss=0.1712, avg=0.1563, skip=0] 
+
+  Loss breakdown:
+    loss_classifier: 0.0407
+    loss_box_reg: 0.1035
+    loss_objectness: 0.0014
+    loss_rpn_box_reg: 0.0106
+
+Evaluating Epoch 17
+Evaluating: 100%|█████████████████████████████████████████████████████████████████| 33/33 [03:06<00:00,  5.64s/it] 
+
+Evaluation Summary:
+  Total predictions: 8810
+  Background filtered: 0
+  Errors: 0
+  Sample prediction: {'image_id': 692, 'category_id': 1, 'bbox': [813.3893432617188, 291.60546875, 106.45111083984375, 46.442626953125], 'score': 0.9997262358665466}
+  Category IDs in predictions: {1}
+  Category IDs in ground truth: {1}
+Loading and preparing results...
+DONE (t=0.17s)
+creating index...
+index created!
+Running per image evaluation...
+Evaluate annotation type *bbox*
+DONE (t=5.82s).
+Accumulating evaluation results...
+DONE (t=0.07s).
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.824
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.989
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.987
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.511
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.824
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.853
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.021
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.202
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.862
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.644
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.863
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.884
+
+======================================================================
+Epoch 17 Summary:
+  Train Loss: 0.1563
+  Val mAP@[.5:.95]: 0.8238
+  Val AP@0.50: 0.9894
+  Val AP@0.75: 0.9871
+  Learning Rate: 0.000100
+======================================================================
+No improvement for 1 epoch(s)
+Best AP@0.50: 0.9895
+
+======================================================================
+Epoch 18/50
+======================================================================
+Epoch 18 [Train]: 100%|██████████████████████| 116/116 [1:05:23<00:00, 33.82s/it, loss=0.1699, avg=0.1565, skip=0] 
+
+  Loss breakdown:
+    loss_classifier: 0.0406
+    loss_box_reg: 0.1037
+    loss_objectness: 0.0016
+    loss_rpn_box_reg: 0.0106
+
+Evaluating Epoch 18
+Evaluating: 100%|█████████████████████████████████████████████████████████████████| 33/33 [02:50<00:00,  5.16s/it] 
+
+Evaluation Summary:
+  Total predictions: 8815
+  Background filtered: 0
+  Errors: 0
+  Sample prediction: {'image_id': 692, 'category_id': 1, 'bbox': [966.4248046875, 294.6041259765625, 82.4349365234375, 105.961181640625], 'score': 0.9997543692588806}
+  Category IDs in predictions: {1}
+  Category IDs in ground truth: {1}
+Loading and preparing results...
+DONE (t=0.00s)
+creating index...
+index created!
+Running per image evaluation...
+Evaluate annotation type *bbox*
+DONE (t=5.90s).
+Accumulating evaluation results...
+DONE (t=0.07s).
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.823
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.989
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.987
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.508
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.823
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.852
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.021
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.203
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.862
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.640
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.863
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.884
+
+======================================================================
+Epoch 18 Summary:
+  Train Loss: 0.1565
+  Val mAP@[.5:.95]: 0.8234
+  Val AP@0.50: 0.9894
+  Val AP@0.75: 0.9873
+  Learning Rate: 0.000100
+======================================================================
+No improvement for 2 epoch(s)
+Best AP@0.50: 0.9895
+
+======================================================================
+Epoch 19/50
+======================================================================
+Epoch 19 [Train]: 100%|██████████████████████| 116/116 [1:05:24<00:00, 33.84s/it, loss=0.2038, avg=0.1553, skip=0] 
+
+  Loss breakdown:
+    loss_classifier: 0.0400
+    loss_box_reg: 0.1032
+    loss_objectness: 0.0015
+    loss_rpn_box_reg: 0.0106
+
+Evaluating Epoch 19
+Evaluating: 100%|█████████████████████████████████████████████████████████████████| 33/33 [03:06<00:00,  5.66s/it] 
+
+Evaluation Summary:
+  Total predictions: 8809
+  Background filtered: 0
+  Errors: 0
+  Sample prediction: {'image_id': 692, 'category_id': 1, 'bbox': [966.4217529296875, 294.37774658203125, 82.516845703125, 105.99710083007812], 'score': 0.9997630715370178}
+  Category IDs in predictions: {1}
+  Category IDs in ground truth: {1}
+Loading and preparing results...
+DONE (t=0.13s)
+creating index...
+index created!
+Running per image evaluation...
+Evaluate annotation type *bbox*
+DONE (t=5.90s).
+Accumulating evaluation results...
+DONE (t=0.08s).
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.824
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.989
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.977
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.506
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.825
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.858
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.021
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.203
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.863
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.644
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.864
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.889
+
+======================================================================
+Epoch 19 Summary:
+  Train Loss: 0.1553
+  Val mAP@[.5:.95]: 0.8237
+  Val AP@0.50: 0.9894
+  Val AP@0.75: 0.9774
+  Learning Rate: 0.000100
+======================================================================
+No improvement for 3 epoch(s)
+Best AP@0.50: 0.9895
+
+======================================================================
+Epoch 20/50
+======================================================================
+Epoch 20 [Train]: 100%|██████████████████████| 116/116 [1:05:33<00:00, 33.91s/it, loss=0.1862, avg=0.1559, skip=0] 
+
+  Loss breakdown:
+    loss_classifier: 0.0405
+    loss_box_reg: 0.1033
+    loss_objectness: 0.0015
+    loss_rpn_box_reg: 0.0106
+
+Evaluating Epoch 20
+Evaluating: 100%|█████████████████████████████████████████████████████████████████| 33/33 [02:50<00:00,  5.15s/it] 
+
+Evaluation Summary:
+  Total predictions: 8802
+  Background filtered: 0
+  Errors: 0
+  Sample prediction: {'image_id': 692, 'category_id': 1, 'bbox': [812.7893676757812, 291.486572265625, 107.3731689453125, 46.69427490234375], 'score': 0.9997822642326355}
+  Category IDs in predictions: {1}
+  Category IDs in ground truth: {1}
+Loading and preparing results...
+DONE (t=0.02s)
+creating index...
+index created!
+Running per image evaluation...
+Evaluate annotation type *bbox*
+DONE (t=5.69s).
+Accumulating evaluation results...
+DONE (t=0.08s).
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.823
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.989
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.987
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.512
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.824
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.853
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.021
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.202
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.862
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.644
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.864
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.886
+
+======================================================================
+Epoch 20 Summary:
+  Train Loss: 0.1559
+  Val mAP@[.5:.95]: 0.8235
+  Val AP@0.50: 0.9894
+  Val AP@0.75: 0.9871
+  Learning Rate: 0.000100
+======================================================================
+No improvement for 4 epoch(s)
+Best AP@0.50: 0.9895
+
+======================================================================
+Epoch 21/50
+======================================================================
+Epoch 21 [Train]: 100%|██████████████████████| 116/116 [1:05:20<00:00, 33.80s/it, loss=0.1905, avg=0.1556, skip=0] 
+
+  Loss breakdown:
+    loss_classifier: 0.0403
+    loss_box_reg: 0.1031
+    loss_objectness: 0.0016
+    loss_rpn_box_reg: 0.0106
+
+Evaluating Epoch 21
+Evaluating: 100%|█████████████████████████████████████████████████████████████████| 33/33 [03:06<00:00,  5.65s/it] 
+
+Evaluation Summary:
+  Total predictions: 8803
+  Background filtered: 0
+  Errors: 0
+  Sample prediction: {'image_id': 692, 'category_id': 1, 'bbox': [966.2904052734375, 294.60821533203125, 82.7113037109375, 106.1368408203125], 'score': 0.9997765421867371}
+  Category IDs in predictions: {1}
+  Category IDs in ground truth: {1}
+Loading and preparing results...
+DONE (t=0.02s)
+creating index...
+index created!
+Running per image evaluation...
+Evaluate annotation type *bbox*
+DONE (t=5.79s).
+Accumulating evaluation results...
+DONE (t=0.08s).
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.824
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.989
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.987
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.506
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.825
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.851
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.021
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.203
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.862
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.636
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.863
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.880
+
+======================================================================
+Epoch 21 Summary:
+  Train Loss: 0.1556
+  Val mAP@[.5:.95]: 0.8238
+  Val AP@0.50: 0.9894
+  Val AP@0.75: 0.9871
+  Learning Rate: 0.000100
+======================================================================
+No improvement for 5 epoch(s)
+Best AP@0.50: 0.9895
+
+======================================================================
+Epoch 22/50
+======================================================================
+Epoch 22 [Train]: 100%|██████████████████████| 116/116 [1:05:26<00:00, 33.85s/it, loss=0.1174, avg=0.1549, skip=0] 
+
+  Loss breakdown:
+    loss_classifier: 0.0403
+    loss_box_reg: 0.1028
+    loss_objectness: 0.0014
+    loss_rpn_box_reg: 0.0105
+
+Evaluating Epoch 22
+Evaluating: 100%|█████████████████████████████████████████████████████████████████| 33/33 [02:51<00:00,  5.19s/it] 
+
+Evaluation Summary:
+  Total predictions: 8799
+  Background filtered: 0
+  Errors: 0
+  Sample prediction: {'image_id': 692, 'category_id': 1, 'bbox': [966.1322021484375, 294.3811950683594, 82.907470703125, 106.358154296875], 'score': 0.9997677206993103}
+  Category IDs in predictions: {1}
+  Category IDs in ground truth: {1}
+Loading and preparing results...
+DONE (t=0.01s)
+creating index...
+index created!
+Running per image evaluation...
+Evaluate annotation type *bbox*
+DONE (t=5.82s).
+Accumulating evaluation results...
+DONE (t=0.07s).
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.823
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.989
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.977
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.504
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.824
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.856
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.021
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.203
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.863
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.636
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.864
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.889
+
+======================================================================
+Epoch 22 Summary:
+  Train Loss: 0.1549
+  Val mAP@[.5:.95]: 0.8227
+  Val AP@0.50: 0.9894
+  Val AP@0.75: 0.9772
+  Learning Rate: 0.000100
+======================================================================
+No improvement for 6 epoch(s)
+Best AP@0.50: 0.9895
+
+======================================================================
+Epoch 23/50
+======================================================================
+Epoch 23 [Train]: 100%|██████████████████████| 116/116 [1:05:28<00:00, 33.87s/it, loss=0.2339, avg=0.1560, skip=0] 
+
+  Loss breakdown:
+    loss_classifier: 0.0406
+    loss_box_reg: 0.1033
+    loss_objectness: 0.0015
+    loss_rpn_box_reg: 0.0106
+
+Evaluating Epoch 23
+Evaluating: 100%|█████████████████████████████████████████████████████████████████| 33/33 [03:06<00:00,  5.65s/it] 
+
+Evaluation Summary:
+  Total predictions: 8778
+  Background filtered: 0
+  Errors: 0
+  Sample prediction: {'image_id': 692, 'category_id': 1, 'bbox': [968.7166137695312, 294.2298889160156, 78.53057861328125, 104.52810668945312], 'score': 0.9997479319572449}
+  Category IDs in predictions: {1}
+  Category IDs in ground truth: {1}
+Loading and preparing results...
+DONE (t=0.02s)
+creating index...
+index created!
+Running per image evaluation...
+Evaluate annotation type *bbox*
+DONE (t=5.66s).
+Accumulating evaluation results...
+DONE (t=0.08s).
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.824
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.989
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.987
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.499
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.824
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.853
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.021
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.203
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.862
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.622
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.863
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.882
+
+======================================================================
+Epoch 23 Summary:
+  Train Loss: 0.1560
+  Val mAP@[.5:.95]: 0.8238
+  Val AP@0.50: 0.9895
+  Val AP@0.75: 0.9869
+  Learning Rate: 0.000100
+======================================================================
+No improvement for 7 epoch(s)
+Best AP@0.50: 0.9895
+
+======================================================================
+Epoch 24/50
+======================================================================
+Epoch 24 [Train]: 100%|██████████████████████| 116/116 [1:05:23<00:00, 33.83s/it, loss=0.1607, avg=0.1541, skip=0] 
+
+  Loss breakdown:
+    loss_classifier: 0.0397
+    loss_box_reg: 0.1023
+    loss_objectness: 0.0016
+    loss_rpn_box_reg: 0.0105
+
+Evaluating Epoch 24
+Evaluating: 100%|█████████████████████████████████████████████████████████████████| 33/33 [02:50<00:00,  5.15s/it] 
+
+Evaluation Summary:
+  Total predictions: 8802
+  Background filtered: 0
+  Errors: 0
+  Sample prediction: {'image_id': 692, 'category_id': 1, 'bbox': [965.49365234375, 293.85955810546875, 83.1881103515625, 105.20852661132812], 'score': 0.9998371601104736}
+  Category IDs in predictions: {1}
+  Category IDs in ground truth: {1}
+Loading and preparing results...
+DONE (t=0.02s)
+creating index...
+index created!
+Running per image evaluation...
+Evaluate annotation type *bbox*
+DONE (t=5.81s).
+Accumulating evaluation results...
+DONE (t=0.07s).
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.823
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.989
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.987
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.503
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.824
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.857
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.021
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.203
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.862
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.622
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.864
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.891
+
+======================================================================
+Epoch 24 Summary:
+  Train Loss: 0.1541
+  Val mAP@[.5:.95]: 0.8233
+  Val AP@0.50: 0.9894
+  Val AP@0.75: 0.9871
+  Learning Rate: 0.000100
+======================================================================
+No improvement for 8 epoch(s)
+Best AP@0.50: 0.9895
+
+======================================================================
+Epoch 25/50
+======================================================================
+Epoch 25 [Train]: 100%|██████████████████████| 116/116 [1:05:27<00:00, 33.85s/it, loss=0.1579, avg=0.1545, skip=0] 
+
+  Loss breakdown:
+    loss_classifier: 0.0401
+    loss_box_reg: 0.1022
+    loss_objectness: 0.0016
+    loss_rpn_box_reg: 0.0106
+
+Evaluating Epoch 25
+Evaluating: 100%|█████████████████████████████████████████████████████████████████| 33/33 [03:06<00:00,  5.65s/it] 
+
+Evaluation Summary:
+  Total predictions: 8780
+  Background filtered: 0
+  Errors: 0
+  Sample prediction: {'image_id': 692, 'category_id': 1, 'bbox': [965.6533203125, 293.6163330078125, 83.1331787109375, 105.6500244140625], 'score': 0.9998217225074768}
+  Category IDs in predictions: {1}
+  Category IDs in ground truth: {1}
+Loading and preparing results...
+DONE (t=0.01s)
+creating index...
+index created!
+Running per image evaluation...
+Evaluate annotation type *bbox*
+DONE (t=5.75s).
+Accumulating evaluation results...
+DONE (t=0.07s).
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.824
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.989
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.987
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.506
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.824
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.858
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.021
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.203
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.862
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.624
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.863
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.893
+
+======================================================================
+Epoch 25 Summary:
+  Train Loss: 0.1545
+  Val mAP@[.5:.95]: 0.8237
+  Val AP@0.50: 0.9894
+  Val AP@0.75: 0.9870
+  Learning Rate: 0.000100
+======================================================================
+No improvement for 9 epoch(s)
+Best AP@0.50: 0.9895
+
+======================================================================
+Epoch 26/50
+======================================================================
+Epoch 26 [Train]: 100%|██████████████████████| 116/116 [1:05:00<00:00, 33.62s/it, loss=0.1430, avg=0.1545, skip=0] 
+
+  Loss breakdown:
+    loss_classifier: 0.0404
+    loss_box_reg: 0.1021
+    loss_objectness: 0.0015
+    loss_rpn_box_reg: 0.0105
+
+Evaluating Epoch 26
+Evaluating: 100%|█████████████████████████████████████████████████████████████████| 33/33 [02:57<00:00,  5.37s/it] 
+
+Evaluation Summary:
+  Total predictions: 8797
+  Background filtered: 0
+  Errors: 0
+  Sample prediction: {'image_id': 692, 'category_id': 1, 'bbox': [966.2824096679688, 294.49365234375, 82.88018798828125, 106.17327880859375], 'score': 0.9997971653938293}
+  Category IDs in predictions: {1}
+  Category IDs in ground truth: {1}
+Loading and preparing results...
+DONE (t=1.94s)
+creating index...
+index created!
+Running per image evaluation...
+Evaluate annotation type *bbox*
+DONE (t=5.80s).
+Accumulating evaluation results...
+DONE (t=0.07s).
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.825
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.989
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.987
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.512
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.825
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.860
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.021
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.202
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.863
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.638
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.864
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.891
+
+======================================================================
+Epoch 26 Summary:
+  Train Loss: 0.1545
+  Val mAP@[.5:.95]: 0.8246
+  Val AP@0.50: 0.9895
+  Val AP@0.75: 0.9872
+  Learning Rate: 0.000100
+======================================================================
+No improvement for 10 epoch(s)
+Best AP@0.50: 0.9895
+
+======================================================================
+Epoch 27/50
+======================================================================
+Epoch 27 [Train]: 100%|██████████████████████| 116/116 [1:05:37<00:00, 33.95s/it, loss=0.2282, avg=0.1544, skip=0] 
+
+  Loss breakdown:
+    loss_classifier: 0.0399
+    loss_box_reg: 0.1025
+    loss_objectness: 0.0016
+    loss_rpn_box_reg: 0.0104
+
+Evaluating Epoch 27
+Evaluating: 100%|█████████████████████████████████████████████████████████████████| 33/33 [02:58<00:00,  5.40s/it] 
+
+Evaluation Summary:
+  Total predictions: 8772
+  Background filtered: 0
+  Errors: 0
+  Sample prediction: {'image_id': 692, 'category_id': 1, 'bbox': [966.4913330078125, 294.5693359375, 82.475830078125, 106.43655395507812], 'score': 0.9998088479042053}
+  Category IDs in predictions: {1}
+  Category IDs in ground truth: {1}
+Loading and preparing results...
+DONE (t=0.02s)
+creating index...
+index created!
+Running per image evaluation...
+Evaluate annotation type *bbox*
+DONE (t=5.83s).
+Accumulating evaluation results...
+DONE (t=0.07s).
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.825
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.989
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.987
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.520
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.825
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.858
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.021
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.203
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.863
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.644
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.864
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.889
+
+======================================================================
+Epoch 27 Summary:
+  Train Loss: 0.1544
+  Val mAP@[.5:.95]: 0.8249
+  Val AP@0.50: 0.9894
+  Val AP@0.75: 0.9871
+  Learning Rate: 0.000100
+======================================================================
+No improvement for 11 epoch(s)
+Best AP@0.50: 0.9895
+
+======================================================================
+Epoch 28/50
+======================================================================
+Epoch 28 [Train]: 100%|██████████████████████| 116/116 [1:05:46<00:00, 34.03s/it, loss=0.1068, avg=0.1540, skip=0] 
+
+  Loss breakdown:
+    loss_classifier: 0.0397
+    loss_box_reg: 0.1024
+    loss_objectness: 0.0015
+    loss_rpn_box_reg: 0.0104
+
+Evaluating Epoch 28
+Evaluating: 100%|█████████████████████████████████████████████████████████████████| 33/33 [02:56<00:00,  5.36s/it] 
+
+Evaluation Summary:
+  Total predictions: 8774
+  Background filtered: 0
+  Errors: 0
+  Sample prediction: {'image_id': 692, 'category_id': 1, 'bbox': [965.2430419921875, 293.5179748535156, 83.10498046875, 105.36495971679688], 'score': 0.9998149275779724}
+  Category IDs in predictions: {1}
+  Category IDs in ground truth: {1}
+Loading and preparing results...
+DONE (t=0.01s)
+creating index...
+index created!
+Running per image evaluation...
+Evaluate annotation type *bbox*
+DONE (t=7.43s).
+Accumulating evaluation results...
+DONE (t=0.07s).
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.823
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.989
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.987
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.521
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.823
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.856
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.021
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.202
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.862
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.644
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.863
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.889
+
+======================================================================
+Epoch 28 Summary:
+  Train Loss: 0.1540
+  Val mAP@[.5:.95]: 0.8234
+  Val AP@0.50: 0.9894
+  Val AP@0.75: 0.9869
+  Learning Rate: 0.000100
+======================================================================
+No improvement for 12 epoch(s)
+Best AP@0.50: 0.9895
+
+======================================================================
+Epoch 29/50
+======================================================================
+Epoch 29 [Train]: 100%|██████████████████████| 116/116 [1:09:02<00:00, 35.71s/it, loss=0.2041, avg=0.1540, skip=0] 
+
+  Loss breakdown:
+    loss_classifier: 0.0397
+    loss_box_reg: 0.1023
+    loss_objectness: 0.0015
+    loss_rpn_box_reg: 0.0105
+
+Evaluating Epoch 29
+Evaluating: 100%|█████████████████████████████████████████████████████████████████| 33/33 [02:29<00:00,  4.53s/it] 
+
+Evaluation Summary:
+  Total predictions: 8784
+  Background filtered: 0
+  Errors: 0
+  Sample prediction: {'image_id': 692, 'category_id': 1, 'bbox': [966.4781494140625, 294.39080810546875, 81.9256591796875, 106.52871704101562], 'score': 0.9998214840888977}
+  Category IDs in predictions: {1}
+  Category IDs in ground truth: {1}
+Loading and preparing results...
+DONE (t=0.01s)
+creating index...
+index created!
+Running per image evaluation...
+Evaluate annotation type *bbox*
+DONE (t=5.80s).
+Accumulating evaluation results...
+DONE (t=0.07s).
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.824
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.989
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.987
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.518
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.825
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.859
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.021
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.203
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.863
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.640
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.864
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.891
+
+======================================================================
+Epoch 29 Summary:
+  Train Loss: 0.1540
+  Val mAP@[.5:.95]: 0.8239
+  Val AP@0.50: 0.9894
+  Val AP@0.75: 0.9873
+  Learning Rate: 0.000100
+======================================================================
+No improvement for 13 epoch(s)
+Best AP@0.50: 0.9895
+
+======================================================================
+Epoch 30/50
+======================================================================
+Epoch 30 [Train]: 100%|██████████████████████| 116/116 [1:01:35<00:00, 31.86s/it, loss=0.1456, avg=0.1536, skip=0] 
+
+  Loss breakdown:
+    loss_classifier: 0.0399
+    loss_box_reg: 0.1019
+    loss_objectness: 0.0013
+    loss_rpn_box_reg: 0.0104
+
+Evaluating Epoch 30
+Evaluating: 100%|█████████████████████████████████████████████████████████████████| 33/33 [02:27<00:00,  4.48s/it] 
+
+Evaluation Summary:
+  Total predictions: 8776
+  Background filtered: 0
+  Errors: 0
+  Sample prediction: {'image_id': 692, 'category_id': 1, 'bbox': [965.6495971679688, 293.5036315917969, 83.02935791015625, 105.4239501953125], 'score': 0.9998477697372437}
+  Category IDs in predictions: {1}
+  Category IDs in ground truth: {1}
+Loading and preparing results...
+DONE (t=0.00s)
+creating index...
+index created!
+Running per image evaluation...
+Evaluate annotation type *bbox*
+DONE (t=5.79s).
+Accumulating evaluation results...
+DONE (t=0.07s).
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.823
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.989
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.987
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.512
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.824
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.849
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.021
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.203
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.863
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.638
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.864
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.882
+
+======================================================================
+Epoch 30 Summary:
+  Train Loss: 0.1536
+  Val mAP@[.5:.95]: 0.8234
+  Val AP@0.50: 0.9894
+  Val AP@0.75: 0.9870
+  Learning Rate: 0.000010
+======================================================================
+No improvement for 14 epoch(s)
+Best AP@0.50: 0.9895
+
+======================================================================
+Epoch 31/50
+======================================================================
+Epoch 31 [Train]: 100%|██████████████████████| 116/116 [1:05:14<00:00, 33.75s/it, loss=0.1265, avg=0.1526, skip=0] 
+
+  Loss breakdown:
+    loss_classifier: 0.0390
+    loss_box_reg: 0.1017
+    loss_objectness: 0.0016
+    loss_rpn_box_reg: 0.0104
+
+Evaluating Epoch 31
+Evaluating: 100%|█████████████████████████████████████████████████████████████████| 33/33 [02:28<00:00,  4.49s/it] 
+
+Evaluation Summary:
+  Total predictions: 8787
+  Background filtered: 0
+  Errors: 0
+  Sample prediction: {'image_id': 692, 'category_id': 1, 'bbox': [966.2915649414062, 294.6104431152344, 82.67181396484375, 106.1199951171875], 'score': 0.9998223185539246}
+  Category IDs in predictions: {1}
+  Category IDs in ground truth: {1}
+Loading and preparing results...
+DONE (t=1.60s)
+creating index...
+index created!
+Running per image evaluation...
+Evaluate annotation type *bbox*
+DONE (t=5.78s).
+Accumulating evaluation results...
+DONE (t=0.07s).
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.825
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.989
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.987
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.516
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.825
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.852
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.021
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.202
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.863
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.638
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.865
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.891
+
+======================================================================
+Epoch 31 Summary:
+  Train Loss: 0.1526
+  Val mAP@[.5:.95]: 0.8250
+  Val AP@0.50: 0.9894
+  Val AP@0.75: 0.9874
+  Learning Rate: 0.000010
+======================================================================
+No improvement for 15 epoch(s)
+Best AP@0.50: 0.9895
+
+Early stopping triggered after 15 epochs without improvement
+
+======================================================================
+Training Complete!
+======================================================================
+Best Results:
+  mAP@[.5:.95]: 0.8228
+  AP@0.50: 0.9895
+  AP@0.75: 0.9871
+
+Models saved to: C:\Users\justi\Documents\parking_analyzer\runs\rcnn
+  - best.pt (best AP@0.50)
+  - latest.pt (most recent)
+PS C:\Users\justi\Documents\parking_analyzer> 

@@ -1,0 +1,19 @@
+{
+  "data_dir": "./data",
+  "output_dir": "./runs/rcnn_v3",
+  "num_classes": 2,
+  "pretrained": true,
+  "anchor_sizes": null,
+  "epochs": 50,
+  "batch_size": 2,
+  "workers": 0,
+  "optimizer": "sgd",
+  "lr": 0.00025,
+  "weight_decay": 0.0005,
+  "momentum": 0.9,
+  "scheduler": "step",
+  "lr_step_size": 15,
+  "lr_gamma": 0.1,
+  "patience": 15,
+  "amp": true
+}
