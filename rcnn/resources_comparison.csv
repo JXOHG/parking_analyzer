@@ -1,0 +1,3 @@
+Model,Model Size (MB),GPU Memory (MB)
+Fine-tuned,165.24,841.32
+Pretrained (COCO),166.98,848.59

@@ -1,0 +1,3 @@
+Model,Single Image FPS,Batch FPS,Mean Latency (ms),P95 Latency (ms),P99 Latency (ms)
+Fine-tuned,7.97,7.97,502.01,512.38,516.51
+Pretrained (COCO),7.83,7.83,510.97,520.47,526.81
