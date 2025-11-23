@@ -1,7 +1,9 @@
 """
-Faster R-CNN Training Script - Production Version with Fixed Evaluation
-Training script with robust error handling and validation
+Faster R-CNN Training Script - Production Version with Comprehensive History Tracking
+Training script with robust error handling, validation, and external metric saving
 FIXED: Category ID mismatch causing zero AP scores
+FIXED: Missing category info in COCO dataset causing evaluation to fail
+ADDED: Complete training history tracking and visualization
 """
 
 import os
@@ -18,6 +20,12 @@ import numpy as np
 from tqdm import tqdm
 import argparse
 import warnings
+import matplotlib
+matplotlib.use('Agg')  # Non-interactive backend for server environments
+import matplotlib.pyplot as plt
+import pandas as pd
+from datetime import datetime
+import copy 
 warnings.filterwarnings('ignore')
 
 # Check PyTorch version for compatibility
@@ -38,7 +46,47 @@ class COCODataset(torch.utils.data.Dataset):
         # Load COCO annotations
         print(f"Loading annotations from {json_file}...")
         try:
-            self.coco = COCO(str(json_file))
+            # Load and fix the COCO JSON if needed
+            with open(json_file, 'r') as f:
+                coco_data = json.load(f)
+            
+            # FIXED: Ensure categories field exists and is properly formatted
+            if 'categories' not in coco_data or len(coco_data['categories']) == 0:
+                print("   ⚠️  Warning: Missing or empty 'categories' field in COCO JSON")
+                print("   ✅ Adding default category: car (id=1)")
+                coco_data['categories'] = [
+                    {
+                        'id': 1,
+                        'name': 'car',
+                        'supercategory': 'vehicle'
+                    }
+                ]
+                # Save the fixed version
+                fixed_json = str(json_file).replace('.json', '_fixed.json')
+                with open(fixed_json, 'w') as f:
+                    json.dump(coco_data, f)
+                print(f"   ✅ Saved fixed JSON to: {fixed_json}")
+                json_file = fixed_json
+            
+            # FIXED: Ensure info field exists
+            if 'info' not in coco_data:
+                print("   ⚠️  Warning: Missing 'info' field in COCO JSON")
+                coco_data['info'] = {
+                    'description': 'Car Detection Dataset',
+                    'version': '1.0',
+                    'year': 2024,
+                    'contributor': 'Auto-generated',
+                    'date_created': datetime.now().isoformat()
+                }
+            
+            # FIXED: Ensure licenses field exists
+            if 'licenses' not in coco_data:
+                coco_data['licenses'] = []
+            
+            self.coco = COCO()
+            self.coco.dataset = coco_data
+            self.coco.createIndex()
+            
         except Exception as e:
             print(f"Error: Failed to load COCO file: {e}")
             raise
@@ -49,6 +97,9 @@ class COCODataset(torch.utils.data.Dataset):
         self._validate_dataset()
         
         print(f"Loaded {len(self.ids)} images from {json_file}")
+        
+        # Print category info
+        print(f"   Categories: {self.coco.loadCats(self.coco.getCatIds())}")
     
     def _validate_dataset(self):
         """Validate dataset integrity"""
@@ -239,7 +290,7 @@ def collate_fn(batch):
 
 def train_one_epoch(model, optimizer, data_loader, device, epoch, scaler=None):
     """
-    Train for one epoch with proper error handling
+    Train for one epoch with proper error handling and detailed loss tracking
     """
     model.train()
     
@@ -329,16 +380,19 @@ def train_one_epoch(model, optimizer, data_loader, device, epoch, scaler=None):
     
     avg_loss = total_loss / num_batches if num_batches > 0 else float('inf')
     
-    # Print detailed loss breakdown
+    # Calculate average for each loss component
+    avg_loss_dict = {}
     if num_batches > 0:
         print(f"\n  Loss breakdown:")
         for k, v in loss_dict_cumulative.items():
-            print(f"    {k}: {v/num_batches:.4f}")
+            avg_val = v / num_batches
+            avg_loss_dict[k] = avg_val
+            print(f"    {k}: {avg_val:.4f}")
     
     if num_skipped > 0:
         print(f"  Warning: Skipped {num_skipped} batches due to errors")
     
-    return avg_loss
+    return avg_loss, avg_loss_dict
 
 
 @torch.no_grad()
@@ -346,10 +400,35 @@ def evaluate(model, data_loader, device, coco_gt):
     """
     Evaluate using official COCO metrics with error handling
     FIXED: Proper category ID mapping to prevent zero AP scores
+    FIXED: Ensure COCO ground truth has proper structure with categories
     """
+    from pycocotools.coco import COCO
     from pycocotools.cocoeval import COCOeval
     
     model.eval()
+    
+    # FIXED: Ensure the ground truth COCO object has proper structure
+    if not hasattr(coco_gt, 'dataset') or coco_gt.dataset is None:
+        print("⚠️  ERROR: COCO ground truth dataset is not properly initialized")
+        return 0.0, 0.0, 0.0, None
+    
+    # FIXED: Verify categories exist
+    if 'categories' not in coco_gt.dataset or len(coco_gt.dataset['categories']) == 0:
+        print("⚠️  ERROR: No categories found in ground truth!")
+        print("   Adding default category...")
+        coco_gt.dataset['categories'] = [
+            {
+                'id': 1,
+                'name': 'car',
+                'supercategory': 'vehicle'
+            }
+        ]
+        coco_gt.createIndex()
+    
+    print(f"\n📋 Ground Truth Info:")
+    print(f"   Images: {len(coco_gt.dataset.get('images', []))}")
+    print(f"   Annotations: {len(coco_gt.dataset.get('annotations', []))}")
+    print(f"   Categories: {coco_gt.dataset.get('categories', [])}")
     
     coco_results = []
     num_errors = 0
@@ -412,54 +491,194 @@ def evaluate(model, data_loader, device, coco_gt):
             continue
     
     # Debug information
-    print(f"\nEvaluation Summary:")
-    print(f"  Total predictions: {num_predictions}")
-    print(f"  Background filtered: {num_background_filtered}")
-    print(f"  Errors: {num_errors}")
+    print(f"\n📊 Evaluation Summary:")
+    print(f"   Total predictions: {num_predictions}")
+    print(f"   Background filtered: {num_background_filtered}")
+    print(f"   Errors: {num_errors}")
     
     # Evaluate with COCO API
     if len(coco_results) == 0:
         print("\n⚠️  WARNING: No predictions made!")
-        print("  Possible reasons:")
-        print("    - Score threshold too high")
-        print("    - Model not learning (check training loss)")
-        print("    - All predictions are background")
-        return 0.0, 0.0, 0.0
+        print("   Possible reasons:")
+        print("     - Score threshold too high")
+        print("     - Model not learning (check training loss)")
+        print("     - All predictions are background")
+        return 0.0, 0.0, 0.0, None
     
     # Additional debug info
-    print(f"  Sample prediction: {coco_results[0]}")
-    category_ids = set(r['category_id'] for r in coco_results)
-    print(f"  Category IDs in predictions: {category_ids}")
+    print(f"   Sample prediction: {coco_results[0]}")
+    category_ids_pred = set(r['category_id'] for r in coco_results)
+    print(f"   Category IDs in predictions: {category_ids_pred}")
     
     # Get ground truth category IDs for comparison
-    gt_category_ids = set(ann['category_id'] for ann in coco_gt.dataset['annotations'])
-    print(f"  Category IDs in ground truth: {gt_category_ids}")
+    gt_category_ids = set(cat['id'] for cat in coco_gt.dataset['categories'])
+    print(f"   Category IDs in ground truth: {gt_category_ids}")
     
-    if category_ids != gt_category_ids:
-        print(f"  ⚠️  WARNING: Category ID mismatch!")
-        print(f"     Predictions: {category_ids}")
-        print(f"     Ground truth: {gt_category_ids}")
+    if category_ids_pred != gt_category_ids:
+        print(f"   ⚠️  WARNING: Category ID mismatch!")
+        print(f"      Predictions: {category_ids_pred}")
+        print(f"      Ground truth: {gt_category_ids}")
     
     try:
+        # Create detection results COCO object
         coco_dt = coco_gt.loadRes(coco_results)
+        
+        # Run COCO evaluation
         coco_eval = COCOeval(coco_gt, coco_dt, 'bbox')
         coco_eval.evaluate()
         coco_eval.accumulate()
         coco_eval.summarize()
         
-        # Extract key metrics
-        map_50_95 = coco_eval.stats[0]  # AP @ IoU=0.50:0.95
-        ap50 = coco_eval.stats[1]       # AP @ IoU=0.50
-        ap75 = coco_eval.stats[2]       # AP @ IoU=0.75
+        # Extract ALL metrics from COCO evaluation
+        # stats[0:12] contains all standard COCO metrics
+        metrics = {
+            'map_50_95': float(coco_eval.stats[0]),  # AP @ IoU=0.50:0.95
+            'ap50': float(coco_eval.stats[1]),        # AP @ IoU=0.50
+            'ap75': float(coco_eval.stats[2]),        # AP @ IoU=0.75
+            'ap_small': float(coco_eval.stats[3]),    # AP for small objects
+            'ap_medium': float(coco_eval.stats[4]),   # AP for medium objects
+            'ap_large': float(coco_eval.stats[5]),    # AP for large objects
+            'ar_1': float(coco_eval.stats[6]),        # AR given 1 detection
+            'ar_10': float(coco_eval.stats[7]),       # AR given 10 detections
+            'ar_100': float(coco_eval.stats[8]),      # AR given 100 detections
+            'ar_small': float(coco_eval.stats[9]),    # AR for small objects
+            'ar_medium': float(coco_eval.stats[10]),  # AR for medium objects
+            'ar_large': float(coco_eval.stats[11]),   # AR for large objects
+        }
         
-        return map_50_95, ap50, ap75
+        return metrics['map_50_95'], metrics['ap50'], metrics['ap75'], metrics
         
     except Exception as e:
         print(f"\n⚠️  WARNING: COCO evaluation failed: {e}")
         print(f"    Generated {len(coco_results)} predictions")
         import traceback
         traceback.print_exc()
-        return 0.0, 0.0, 0.0
+        return 0.0, 0.0, 0.0, None
+
+
+def plot_training_curves(history, output_dir):
+    """
+    Generate comprehensive training visualization plots
+    """
+    output_dir = Path(output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    
+    epochs = range(1, len(history['train_loss']) + 1)
+    
+    # Create figure with multiple subplots
+    fig, axes = plt.subplots(2, 3, figsize=(18, 12))
+    fig.suptitle('Training History', fontsize=16, fontweight='bold')
+    
+    # 1. Training Loss
+    ax = axes[0, 0]
+    ax.plot(epochs, history['train_loss'], 'b-o', linewidth=2, markersize=4)
+    ax.set_xlabel('Epoch')
+    ax.set_ylabel('Loss')
+    ax.set_title('Training Loss')
+    ax.grid(True, alpha=0.3)
+    
+    # 2. Validation mAP
+    ax = axes[0, 1]
+    ax.plot(epochs, history['val_map'], 'g-o', linewidth=2, markersize=4, label='mAP@0.5:0.95')
+    ax.plot(epochs, history['val_ap50'], 'r-s', linewidth=2, markersize=4, label='AP@0.50')
+    ax.plot(epochs, history['val_ap75'], 'm-^', linewidth=2, markersize=4, label='AP@0.75')
+    ax.set_xlabel('Epoch')
+    ax.set_ylabel('AP Score')
+    ax.set_title('Validation AP Metrics')
+    ax.legend()
+    ax.grid(True, alpha=0.3)
+    
+    # 3. Learning Rate
+    ax = axes[0, 2]
+    ax.plot(epochs, history['lr'], 'orange', linewidth=2)
+    ax.set_xlabel('Epoch')
+    ax.set_ylabel('Learning Rate')
+    ax.set_title('Learning Rate Schedule')
+    ax.set_yscale('log')
+    ax.grid(True, alpha=0.3)
+    
+    # 4. Loss Components (if available)
+    ax = axes[1, 0]
+    if 'loss_classifier' in history and len(history['loss_classifier']) > 0:
+        ax.plot(epochs, history['loss_classifier'], label='Classifier', linewidth=2)
+        ax.plot(epochs, history['loss_box_reg'], label='Box Reg', linewidth=2)
+        ax.plot(epochs, history['loss_objectness'], label='Objectness', linewidth=2)
+        ax.plot(epochs, history['loss_rpn_box_reg'], label='RPN Box Reg', linewidth=2)
+        ax.set_xlabel('Epoch')
+        ax.set_ylabel('Loss')
+        ax.set_title('Loss Components')
+        ax.legend()
+        ax.grid(True, alpha=0.3)
+    else:
+        ax.text(0.5, 0.5, 'Loss components not available', 
+                ha='center', va='center', transform=ax.transAxes)
+        ax.set_title('Loss Components')
+    
+    # 5. AP by Object Size (if available)
+    ax = axes[1, 1]
+    if 'val_ap_small' in history and len(history['val_ap_small']) > 0:
+        ax.plot(epochs, history['val_ap_small'], label='Small', linewidth=2, marker='o')
+        ax.plot(epochs, history['val_ap_medium'], label='Medium', linewidth=2, marker='s')
+        ax.plot(epochs, history['val_ap_large'], label='Large', linewidth=2, marker='^')
+        ax.set_xlabel('Epoch')
+        ax.set_ylabel('AP Score')
+        ax.set_title('AP by Object Size')
+        ax.legend()
+        ax.grid(True, alpha=0.3)
+    else:
+        ax.text(0.5, 0.5, 'Size-specific AP not available', 
+                ha='center', va='center', transform=ax.transAxes)
+        ax.set_title('AP by Object Size')
+    
+    # 6. Average Recall (if available)
+    ax = axes[1, 2]
+    if 'val_ar_100' in history and len(history['val_ar_100']) > 0:
+        ax.plot(epochs, history['val_ar_1'], label='AR@1', linewidth=2, marker='o')
+        ax.plot(epochs, history['val_ar_10'], label='AR@10', linewidth=2, marker='s')
+        ax.plot(epochs, history['val_ar_100'], label='AR@100', linewidth=2, marker='^')
+        ax.set_xlabel('Epoch')
+        ax.set_ylabel('AR Score')
+        ax.set_title('Average Recall')
+        ax.legend()
+        ax.grid(True, alpha=0.3)
+    else:
+        ax.text(0.5, 0.5, 'AR metrics not available', 
+                ha='center', va='center', transform=ax.transAxes)
+        ax.set_title('Average Recall')
+    
+    plt.tight_layout()
+    plt.savefig(output_dir / 'training_curves.png', dpi=300, bbox_inches='tight')
+    plt.close()
+    
+    print(f"✅ Training curves saved to {output_dir / 'training_curves.png'}")
+    
+    # Create individual high-resolution plots
+    # Loss plot
+    plt.figure(figsize=(10, 6))
+    plt.plot(epochs, history['train_loss'], 'b-o', linewidth=2, markersize=6)
+    plt.xlabel('Epoch', fontsize=12)
+    plt.ylabel('Loss', fontsize=12)
+    plt.title('Training Loss', fontsize=14, fontweight='bold')
+    plt.grid(True, alpha=0.3)
+    plt.tight_layout()
+    plt.savefig(output_dir / 'loss_curve.png', dpi=300, bbox_inches='tight')
+    plt.close()
+    
+    # AP plot
+    plt.figure(figsize=(10, 6))
+    plt.plot(epochs, history['val_map'], 'g-o', linewidth=2, markersize=6, label='mAP@0.5:0.95')
+    plt.plot(epochs, history['val_ap50'], 'r-s', linewidth=2, markersize=6, label='AP@0.50')
+    plt.plot(epochs, history['val_ap75'], 'm-^', linewidth=2, markersize=6, label='AP@0.75')
+    plt.xlabel('Epoch', fontsize=12)
+    plt.ylabel('AP Score', fontsize=12)
+    plt.title('Validation AP Metrics', fontsize=14, fontweight='bold')
+    plt.legend(fontsize=11)
+    plt.grid(True, alpha=0.3)
+    plt.tight_layout()
+    plt.savefig(output_dir / 'ap_curve.png', dpi=300, bbox_inches='tight')
+    plt.close()
+    
+    print(f"✅ Individual plots saved: loss_curve.png, ap_curve.png")
 
 
 def save_checkpoint(model, optimizer, scheduler, epoch, metrics, output_dir, filename):
@@ -479,9 +698,68 @@ def save_checkpoint(model, optimizer, scheduler, epoch, metrics, output_dir, fil
     return save_path
 
 
+def save_metrics_csv(history, output_dir):
+    """
+    Save training history as CSV for easy analysis in spreadsheet software
+    """
+    output_dir = Path(output_dir)
+    
+    # Create DataFrame from history
+    df = pd.DataFrame(history)
+    df.insert(0, 'epoch', range(1, len(df) + 1))
+    
+    # Save to CSV
+    csv_path = output_dir / 'training_metrics.csv'
+    df.to_csv(csv_path, index=False, float_format='%.6f')
+    
+    print(f"✅ Metrics saved to CSV: {csv_path}")
+    
+    # Also save a summary statistics file
+    summary_path = output_dir / 'training_summary.txt'
+    with open(summary_path, 'w') as f:
+        f.write("="*70 + "\n")
+        f.write("TRAINING SUMMARY\n")
+        f.write("="*70 + "\n\n")
+        
+        f.write(f"Total Epochs: {len(df)}\n\n")
+        
+        f.write("BEST METRICS:\n")
+        f.write("-"*70 + "\n")
+        
+        # Find best epoch for each metric
+        for col in df.columns:
+            if col == 'epoch':
+                continue
+            
+            if 'loss' in col:
+                best_idx = df[col].idxmin()
+                best_val = df[col].min()
+                direction = "min"
+            else:
+                best_idx = df[col].idxmax()
+                best_val = df[col].max()
+                direction = "max"
+            
+            best_epoch = df.loc[best_idx, 'epoch']
+            f.write(f"{col:25s}: {best_val:.6f} (epoch {best_epoch}, {direction})\n")
+        
+        f.write("\n" + "="*70 + "\n")
+        f.write("FINAL EPOCH METRICS:\n")
+        f.write("-"*70 + "\n")
+        
+        final_row = df.iloc[-1]
+        for col in df.columns:
+            if col != 'epoch':
+                f.write(f"{col:25s}: {final_row[col]:.6f}\n")
+        
+        f.write("\n" + "="*70 + "\n")
+    
+    print(f"✅ Training summary saved: {summary_path}")
+
+
 def main(args):
     print("="*70)
-    print("Faster R-CNN Training - Production Version (FIXED)")
+    print("Faster R-CNN Training - Production Version with Full History Tracking")
     print("="*70)
     
     # Setup device
@@ -497,9 +775,29 @@ def main(args):
     output_dir = Path(args.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
     
-    # Save arguments
-    with open(output_dir / 'args.json', 'w') as f:
-        json.dump(vars(args), f, indent=2)
+    # Create subdirectories for organization
+    plots_dir = output_dir / 'plots'
+    plots_dir.mkdir(exist_ok=True)
+    
+    checkpoints_dir = output_dir / 'checkpoints'
+    checkpoints_dir.mkdir(exist_ok=True)
+    
+    # Save arguments and training metadata
+    metadata = {
+        'args': vars(args),
+        'start_time': datetime.now().isoformat(),
+        'pytorch_version': torch.__version__,
+        'torchvision_version': torchvision.__version__,
+        'cuda_available': torch.cuda.is_available(),
+        'device': str(device),
+    }
+    
+    if torch.cuda.is_available():
+        metadata['gpu_name'] = torch.cuda.get_device_name(0)
+        metadata['cuda_version'] = torch.version.cuda
+    
+    with open(output_dir / 'training_metadata.json', 'w') as f:
+        json.dump(metadata, f, indent=2)
     
     # Load datasets
     print("\nLoading Datasets")
@@ -657,12 +955,28 @@ def main(args):
     best_ap75 = 0.0
     epochs_no_improve = 0
     
+    # Initialize comprehensive history tracking
     history = {
         'train_loss': [],
         'val_map': [],
         'val_ap50': [],
         'val_ap75': [],
-        'lr': []
+        'lr': [],
+        # Loss components
+        'loss_classifier': [],
+        'loss_box_reg': [],
+        'loss_objectness': [],
+        'loss_rpn_box_reg': [],
+        # Additional COCO metrics
+        'val_ap_small': [],
+        'val_ap_medium': [],
+        'val_ap_large': [],
+        'val_ar_1': [],
+        'val_ar_10': [],
+        'val_ar_100': [],
+        'val_ar_small': [],
+        'val_ar_medium': [],
+        'val_ar_large': [],
     }
     
     try:
@@ -672,7 +986,7 @@ def main(args):
             print(f"{'='*70}")
             
             # Train
-            train_loss = train_one_epoch(
+            train_loss, loss_components = train_one_epoch(
                 model, optimizer, train_loader, device, epoch, scaler
             )
             
@@ -682,14 +996,33 @@ def main(args):
             
             # Evaluate
             print(f"\nEvaluating Epoch {epoch}")
-            val_map, ap50, ap75 = evaluate(model, val_loader, device, val_dataset.coco)
+            val_map, ap50, ap75, detailed_metrics = evaluate(
+                model, val_loader, device, val_dataset.coco
+            )
             
-            # Save history
+            # Save to history - basic metrics
             history['train_loss'].append(float(train_loss))
             history['val_map'].append(float(val_map))
             history['val_ap50'].append(float(ap50))
             history['val_ap75'].append(float(ap75))
             history['lr'].append(float(current_lr))
+            
+            # Save loss components
+            for key in ['loss_classifier', 'loss_box_reg', 'loss_objectness', 'loss_rpn_box_reg']:
+                history[key].append(float(loss_components.get(key, 0.0)))
+            
+            # Save detailed COCO metrics if available
+            if detailed_metrics:
+                for key in ['ap_small', 'ap_medium', 'ap_large', 
+                           'ar_1', 'ar_10', 'ar_100',
+                           'ar_small', 'ar_medium', 'ar_large']:
+                    history[f'val_{key}'].append(detailed_metrics.get(key, 0.0))
+            else:
+                # Append zeros if evaluation failed
+                for key in ['ap_small', 'ap_medium', 'ap_large', 
+                           'ar_1', 'ar_10', 'ar_100',
+                           'ar_small', 'ar_medium', 'ar_large']:
+                    history[f'val_{key}'].append(0.0)
             
             # Print summary
             print(f"\n{'='*70}")
@@ -701,7 +1034,7 @@ def main(args):
             print(f"  Learning Rate: {current_lr:.6f}")
             print(f"{'='*70}")
             
-            # Save latest checkpoint
+            # Save metrics after every epoch
             metrics = {
                 'train_loss': train_loss,
                 'val_map': val_map,
@@ -710,8 +1043,22 @@ def main(args):
                 'history': history
             }
             
+            # Save history files after every epoch
+            with open(output_dir / 'history.json', 'w') as f:
+                json.dump(history, f, indent=2)
+            
+            save_metrics_csv(history, output_dir)
+            
+            # Generate and save plots after every epoch
+            if epoch % args.plot_frequency == 0 or epoch == 1:
+                try:
+                    plot_training_curves(history, plots_dir)
+                except Exception as e:
+                    print(f"Warning: Failed to generate plots: {e}")
+            
+            # Save latest checkpoint
             save_checkpoint(model, optimizer, lr_scheduler, epoch, metrics, 
-                          output_dir, 'latest.pt')
+                          checkpoints_dir, 'latest.pt')
             
             # Save best checkpoint
             if ap50 > best_ap50:
@@ -721,7 +1068,7 @@ def main(args):
                 epochs_no_improve = 0
                 
                 save_path = save_checkpoint(model, optimizer, lr_scheduler, epoch, 
-                                           metrics, output_dir, 'best.pt')
+                                           metrics, checkpoints_dir, 'best.pt')
                 print(f"✅ New best model saved!")
                 print(f"   mAP@[.5:.95]: {best_map:.4f}")
                 print(f"   AP@0.50: {best_ap50:.4f}")
@@ -739,7 +1086,7 @@ def main(args):
             # Save periodic checkpoint
             if epoch % 10 == 0:
                 save_checkpoint(model, optimizer, lr_scheduler, epoch, metrics,
-                              output_dir, f'checkpoint_epoch_{epoch}.pt')
+                              checkpoints_dir, f'checkpoint_epoch_{epoch}.pt')
     
     except KeyboardInterrupt:
         print("\nWarning: Training interrupted by user")
@@ -750,9 +1097,30 @@ def main(args):
         traceback.print_exc()
     
     finally:
-        # Save final history
+        # Save final history and plots
+        print("\n" + "="*70)
+        print("Saving final results...")
+        print("="*70)
+        
         with open(output_dir / 'history.json', 'w') as f:
             json.dump(history, f, indent=2)
+        
+        save_metrics_csv(history, output_dir)
+        
+        try:
+            plot_training_curves(history, plots_dir)
+        except Exception as e:
+            print(f"Warning: Failed to generate final plots: {e}")
+        
+        # Update metadata with completion info
+        metadata['end_time'] = datetime.now().isoformat()
+        metadata['total_epochs'] = len(history['train_loss'])
+        metadata['best_map'] = float(best_map)
+        metadata['best_ap50'] = float(best_ap50)
+        metadata['best_ap75'] = float(best_ap75)
+        
+        with open(output_dir / 'training_metadata.json', 'w') as f:
+            json.dump(metadata, f, indent=2)
         
         print("\n" + "="*70)
         print("Training Complete!")
@@ -761,14 +1129,17 @@ def main(args):
         print(f"  mAP@[.5:.95]: {best_map:.4f}")
         print(f"  AP@0.50: {best_ap50:.4f}")
         print(f"  AP@0.75: {best_ap75:.4f}")
-        print(f"\nModels saved to: {output_dir.absolute()}")
-        print(f"  - best.pt (best AP@0.50)")
-        print(f"  - latest.pt (most recent)")
+        print(f"\nOutputs saved to: {output_dir.absolute()}")
+        print(f"  📁 Checkpoints: {checkpoints_dir.absolute()}")
+        print(f"  📊 Plots: {plots_dir.absolute()}")
+        print(f"  📈 Metrics: training_metrics.csv")
+        print(f"  📝 History: history.json")
+        print(f"  📋 Summary: training_summary.txt")
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
-        description='Faster R-CNN Training - Production Version (FIXED)',
+        description='Faster R-CNN Training - Production Version with Full History Tracking',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
     
@@ -815,6 +1186,8 @@ if __name__ == '__main__':
                         help='Early stopping patience (epochs)')
     parser.add_argument('--amp', action='store_true',
                         help='Use automatic mixed precision training')
+    parser.add_argument('--plot-frequency', type=int, default=1,
+                        help='Generate plots every N epochs')
     
     args = parser.parse_args()
     

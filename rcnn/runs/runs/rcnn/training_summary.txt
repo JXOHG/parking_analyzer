@@ -1,0 +1,50 @@
+======================================================================
+TRAINING SUMMARY
+======================================================================
+
+Total Epochs: 24
+
+BEST METRICS:
+----------------------------------------------------------------------
+train_loss               : 0.154310 (epoch 24, min)
+val_map                  : 0.823697 (epoch 22, max)
+val_ap50                 : 0.989514 (epoch 9, max)
+val_ap75                 : 0.987102 (epoch 13, max)
+lr                       : 0.001000 (epoch 1, max)
+loss_classifier          : 0.039540 (epoch 24, min)
+loss_box_reg             : 0.102879 (epoch 24, min)
+loss_objectness          : 0.001330 (epoch 24, min)
+loss_rpn_box_reg         : 0.010550 (epoch 22, min)
+val_ap_small             : 0.523010 (epoch 22, max)
+val_ap_medium            : 0.823769 (epoch 22, max)
+val_ap_large             : 0.861876 (epoch 13, max)
+val_ar_1                 : 0.020660 (epoch 24, max)
+val_ar_10                : 0.203138 (epoch 20, max)
+val_ar_100               : 0.862769 (epoch 18, max)
+val_ar_small             : 0.650000 (epoch 14, max)
+val_ar_medium            : 0.863954 (epoch 18, max)
+val_ar_large             : 0.884091 (epoch 22, max)
+
+======================================================================
+FINAL EPOCH METRICS:
+----------------------------------------------------------------------
+train_loss               : 0.154310
+val_map                  : 0.823445
+val_ap50                 : 0.989457
+val_ap75                 : 0.986408
+lr                       : 0.000100
+loss_classifier          : 0.039540
+loss_box_reg             : 0.102879
+loss_objectness          : 0.001330
+loss_rpn_box_reg         : 0.010561
+val_ap_small             : 0.521413
+val_ap_medium            : 0.823528
+val_ap_large             : 0.848166
+val_ar_1                 : 0.020660
+val_ar_10                : 0.202950
+val_ar_100               : 0.862675
+val_ar_small             : 0.644000
+val_ar_medium            : 0.863930
+val_ar_large             : 0.872727
+
+======================================================================
