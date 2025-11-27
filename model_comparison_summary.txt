@@ -1,0 +1,14 @@
+COMPARISON SUMMARY
+==================
+Total Images Tested: 99
+
+YOLOv9 Performance:
+  Mean Absolute Error (MAE): 1.02
+  Error Distribution: 0.41 +/- 1.69
+
+Faster R-CNN Performance:
+  Mean Absolute Error (MAE): 3.64
+  Error Distribution: 3.62 +/- 2.93
+
+Conclusion:
+  YOLOv9 provided more accurate counts on average.
