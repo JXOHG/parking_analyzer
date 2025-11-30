@@ -123,6 +123,7 @@ class YOLOv9Trainer:
             print(" loss_tal.py not found, skipping patch")
             return
         
+        
         with open(loss_file, 'r', encoding='utf-8') as f:
             content = f.read()
         

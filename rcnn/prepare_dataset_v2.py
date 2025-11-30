@@ -41,7 +41,7 @@ class CARPKDataPreparation:
         """Create directory structure"""
         for split in ['train', 'val', 'test']:
             (self.output_dir / split).mkdir(parents=True, exist_ok=True)
-        print(f"✓ Created directory structure at {self.output_dir}")
+        print(f" Created directory structure at {self.output_dir}")
     
     def detect_bbox_format(self, bbox, img_width, img_height):
         """
@@ -63,7 +63,7 @@ class CARPKDataPreparation:
             # Assume xyxy if coordinates are within bounds
             self.bbox_format = 'xyxy'
         
-        print(f"🔍 Detected bounding box format: {self.bbox_format}")
+        print(f" Detected bounding box format: {self.bbox_format}")
         return self.bbox_format
     
     def normalize_bbox(self, bbox, img_width, img_height):
@@ -239,7 +239,7 @@ class CARPKDataPreparation:
             
             # Skip images with no valid annotations
             if len(annotations) == 0:
-                print(f"⚠️  Skipping image {sample_idx}: no valid annotations")
+                print(f"  Skipping image {sample_idx}: no valid annotations")
                 os.remove(img_path)  # Remove saved image
                 return None, None, annotation_id
             
@@ -259,7 +259,7 @@ class CARPKDataPreparation:
             return image_info, annotations, annotation_id
             
         except Exception as e:
-            print(f"⚠️  Error processing sample {sample_idx}: {e}")
+            print(f"  Error processing sample {sample_idx}: {e}")
             return None, None, annotation_id
     
     def create_coco_json(self, split, images, annotations):
@@ -298,7 +298,7 @@ class CARPKDataPreparation:
         with open(json_path, 'w') as f:
             json.dump(coco_format, f, indent=2)
         
-        print(f"✓ Created {json_path}")
+        print(f" Created {json_path}")
         print(f"  - Images: {len(images)}")
         print(f"  - Annotations: {len(annotations)}")
     
@@ -307,17 +307,17 @@ class CARPKDataPreparation:
         json_path = self.output_dir / f'{split}.json'
         
         if not json_path.exists():
-            print(f"⚠️  Cannot visualize {split}: JSON file not found")
+            print(f"  Cannot visualize {split}: JSON file not found")
             return
         
         with open(json_path, 'r') as f:
             data = json.load(f)
         
         if len(data['images']) == 0:
-            print(f"⚠️  No images in {split} split to visualize")
+            print(f"  No images in {split} split to visualize")
             return
         
-        print(f"\n📊 Visualizing {num_samples} samples from {split}...")
+        print(f"\n Visualizing {num_samples} samples from {split}...")
         
         num_samples = min(num_samples, len(data['images']))
         fig, axes = plt.subplots(1, num_samples, figsize=(15, 5))
@@ -329,7 +329,7 @@ class CARPKDataPreparation:
             img_path = self.output_dir / split / img_info['file_name']
             
             if not img_path.exists():
-                print(f"⚠️  Image not found: {img_path}")
+                print(f"  Image not found: {img_path}")
                 continue
             
             img = Image.open(img_path)
@@ -355,13 +355,13 @@ class CARPKDataPreparation:
         plt.tight_layout()
         save_path = self.output_dir / f'{split}_samples.png'
         plt.savefig(save_path, dpi=150, bbox_inches='tight')
-        print(f"✓ Saved visualization to {save_path}")
+        print(f" Saved visualization to {save_path}")
         plt.close()
     
     def analyze_box_sizes(self):
         """Analyze bounding box sizes to recommend anchor sizes"""
         if not self.box_sizes:
-            print("⚠️  No box sizes to analyze")
+            print("  No box sizes to analyze")
             return
         
         widths = [w for w, h in self.box_sizes]
@@ -369,7 +369,7 @@ class CARPKDataPreparation:
         areas = [w * h for w, h in self.box_sizes]
         
         print("\n" + "="*70)
-        print("📏 Bounding Box Size Analysis")
+        print(" Bounding Box Size Analysis")
         print("="*70)
         
         print(f"\nWidth Statistics:")
@@ -395,14 +395,14 @@ class CARPKDataPreparation:
         print(f"  Median: {np.median(areas):.1f}px²")
         
         # Recommend anchor sizes
-        print("\n💡 Recommended Anchor Sizes:")
+        print("\n Recommended Anchor Sizes:")
         sqrt_areas = np.sqrt(areas)
         percentiles = [10, 30, 50, 70, 90]
         anchor_sizes = [int(np.percentile(sqrt_areas, p)) for p in percentiles]
         anchor_str = ','.join(map(str, anchor_sizes))
         print(f"  {tuple(anchor_sizes)}")
         print(f"  (Based on {percentiles}th percentiles of sqrt(area))")
-        print(f"\n🎯 Use this flag when training:")
+        print(f"\n Use this flag when training:")
         print(f"  --anchor-sizes \"{anchor_str}\"")
     
     def prepare_dataset(self, max_samples=None, test_first=True):
@@ -415,34 +415,34 @@ class CARPKDataPreparation:
         self.create_directories()
         
         # Load dataset
-        print("\n📥 Loading dataset from HuggingFace...")
+        print("\n Loading dataset from HuggingFace...")
         try:
             dataset = load_dataset("backseollgi/parking_dataset", "carpk", streaming=False)
         except Exception as e:
-            print(f"❌ Failed to load dataset: {e}")
-            print("💡 Make sure you have internet connection and the dataset exists")
+            print(f" Failed to load dataset: {e}")
+            print(" Make sure you have internet connection and the dataset exists")
             return
         
-        print(f"✓ Dataset loaded successfully")
-        print(f"📋 Available splits: {list(dataset.keys())}")
+        print(f" Dataset loaded successfully")
+        print(f" Available splits: {list(dataset.keys())}")
         
         # Get samples from the dataset
         if 'train' in dataset:
             samples = list(dataset['train'])
         elif len(dataset.keys()) > 0:
             key = list(dataset.keys())[0]
-            print(f"⚠️  'train' split not found, using '{key}' instead")
+            print(f"  'train' split not found, using '{key}' instead")
             samples = list(dataset[key])
         else:
-            print("❌ Dataset has unexpected structure!")
+            print(" Dataset has unexpected structure!")
             return
         
         total_samples = len(samples)
-        print(f"✓ Found {total_samples} samples")
+        print(f" Found {total_samples} samples")
         
         # Test first sample if requested
         if test_first:
-            print("\n🔍 Inspecting first sample...")
+            print("\n Inspecting first sample...")
             sample = samples[0]
             print(f"  Keys: {list(sample.keys())}")
             print(f"  Image type: {type(sample['image'])}")
@@ -457,21 +457,21 @@ class CARPKDataPreparation:
                 if len(sample['bbox']) > 0:
                     print(f"  First bbox: {sample['bbox'][0]}")
             else:
-                print("  ⚠️  Warning: No 'bboxes' or 'bbox' field found!")
+                print("    Warning: No 'bboxes' or 'bbox' field found!")
         
         if max_samples:
             total_samples = min(total_samples, max_samples)
             samples = samples[:total_samples]
-            print(f"📌 Limited to {total_samples} samples for testing")
+            print(f" Limited to {total_samples} samples for testing")
         
         # Check dataset size
         if total_samples < 1000:
-            print(f"\n⚠️  WARNING: Only {total_samples} samples available!")
+            print(f"\n  WARNING: Only {total_samples} samples available!")
             print("   Faster R-CNN performs best with 2000+ images")
             print("   Consider using a pretrained model and strong augmentation")
         
         # Process samples
-        print("\n🔄 Processing samples...")
+        print("\n Processing samples...")
         
         train_images, train_annotations = [], []
         val_images, val_annotations = [], []
@@ -511,23 +511,23 @@ class CARPKDataPreparation:
         
         # Validate we have data
         if len(train_images) == 0:
-            print("\n❌ ERROR: No training images were processed successfully!")
+            print("\n ERROR: No training images were processed successfully!")
             print("   Please check the dataset format and try again")
             return
         
         # Create COCO JSONs
-        print("\n📝 Creating COCO format files...")
+        print("\n Creating COCO format files...")
         self.create_coco_json('train', train_images, train_annotations)
         
         if len(val_images) > 0:
             self.create_coco_json('val', val_images, val_annotations)
         else:
-            print("⚠️  No validation images - skipping val.json")
+            print("  No validation images - skipping val.json")
         
         if len(test_images) > 0:
             self.create_coco_json('test', test_images, test_annotations)
         else:
-            print("⚠️  No test images - skipping test.json")
+            print("  No test images - skipping test.json")
         
         # Analyze and visualize
         self.analyze_box_sizes()
@@ -539,10 +539,10 @@ class CARPKDataPreparation:
                 self.visualize_samples(split, num_samples=3)
         
         print("\n" + "="*70)
-        print("✅ Dataset Preparation Complete!")
+        print(" Dataset Preparation Complete!")
         print("="*70)
         print(f"\nData saved to: {self.output_dir.absolute()}")
-        print("\n📝 Next steps:")
+        print("\n Next steps:")
         print("  1. Review the visualization images to verify data quality")
         print("  2. Use the recommended anchor sizes when training")
         print("  3. Start training with: python train_rcnn.py")
@@ -550,14 +550,14 @@ class CARPKDataPreparation:
     def print_statistics(self):
         """Print comprehensive statistics"""
         print("\n" + "="*70)
-        print("📊 Dataset Statistics")
+        print(" Dataset Statistics")
         print("="*70)
         
         total_images = sum(s['images'] for s in self.stats.values())
         total_boxes = sum(s['boxes'] for s in self.stats.values())
         
         if total_images == 0:
-            print("\n⚠️  No images were processed successfully!")
+            print("\n  No images were processed successfully!")
             return
         
         for split in ['train', 'val', 'test']:
