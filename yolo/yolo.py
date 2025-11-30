@@ -60,7 +60,7 @@ class YOLOv9Trainer:
             'data/hyps/hyp.scratch-high.yaml'
         ]
         
-        print("\n🔍 Verifying YOLOv9 structure...")
+        print("\n Verifying YOLOv9 structure...")
         all_exist = True
         for file in required_files:
             file_path = self.yolov9_dir / file
@@ -87,7 +87,7 @@ class YOLOv9Trainer:
                 sys.executable, '-m', 'pip', 'install', '-r', 
                 str(requirements_file)
             ], check=True)
-            print("✓ Requirements installed")
+            print(" Requirements installed")
     
     def _patch_torch_load(self):
         """Patch train.py to fix PyTorch 2.6 weights_only issue"""
