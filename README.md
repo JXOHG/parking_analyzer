@@ -77,7 +77,7 @@ Goal: Analyze parking occupancy and detection using modern object detection arch
 - The dataset preparation notebook creates standardized COCO-format splits to ensure consistent evaluation across models.
 - The Faster R-CNN training script is a `.py` file due to known Jupyter limitations with multi-worker data loaders and threading; please run from a terminal/IDE.
 - Each evaluation notebook includes visualizations and metrics on the test set to streamline assessment.
-- Some large files (including models) have been pushed via Github LFS (Large File Storage). I have been having some issues with its bandwidth limit, if this is the case let me know.
+- Some large files (including models with .pt extensions) have been pushed via Github LFS (Large File Storage). I have been having some issues with its bandwidth limit, if this is the case let me know.
 
 ## Repository Structure (key folders/files)
 - `/yolo` — YOLOv9 training, evaluation, and comparison notebooks
