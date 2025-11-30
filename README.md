@@ -45,7 +45,7 @@ Goal: Analyze parking occupancy and detection using modern object detection arch
 1. Environment Setup
    - Python 3.10+ recommended
    - Install dependencies (PyTorch, torchvision, ultralytics or YOLOv9-specific deps, COCO tools):
-     - `pip install -r requirements.txt` (if available)
+     - `pip install -r requirements.txt` 
      - Otherwise, ensure:
        - PyTorch with CUDA (if GPU is available)
        - torchvision
