@@ -1,0 +1,27 @@
+# Core scientific stack
+numpy>=1.24
+pandas>=1.5
+
+# Plotting
+matplotlib>=3.7
+seaborn
+
+# Progress bars
+tqdm>=4.66
+
+# Image I/O
+Pillow>=10.0
+
+# Dataset handling and utilities
+pycocotools>=2.0.7
+PyYAML
+datasets  # For Hugging Face datasets
+
+# PyTorch stack (choose builds appropriate to your environment)
+torch>=2.2
+torchvision>=0.17
+
+# Jupyter environment to run notebooks
+notebook>=7.0
+jupyterlab>=4.0
+ipykernel>=6.29
